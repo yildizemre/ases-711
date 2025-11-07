@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Stok Takip{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1a1a1a;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+            --light-bg: #f8f9fa;
+            --white: #ffffff;
+            --border-color: #e9ecef;
+            --text-muted: #6c757d;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            color: var(--primary-color);
+        }
+
+        .navbar {
+            background: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Sidebar Layout */
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: var(--white);
+            border-right: 1px solid var(--border-color);
+            box-shadow: 2px 0 8px rgba(0,0,0,0.04);
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            z-index: 1020;
+        }
+
+        .sidebar.collapsed {
+            width: 72px;
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: center;
+        }
+
+        .sidebar-brand img {
+            height: 48px;
+            width: auto;
+        }
+
+        .sidebar-nav {
+            padding: 0.75rem;
+            flex: 1 1 auto;
+            overflow-y: auto;
+        }
+
+        .sidebar-link, .sidebar-sublink {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            color: var(--secondary-color);
+            text-decoration: none;
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-link:hover, .sidebar-sublink:hover {
+            background: var(--light-bg);
+            color: var(--primary-color);
+        }
+
+        .sidebar-section { margin-top: 0.5rem; }
+        .sidebar-section-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            padding: 0.5rem 0.75rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 6px;
+            transition: background 0.2s ease;
+        }
+
+        .sidebar-section-title:hover {
+            background: var(--light-bg);
+        }
+
+        .sidebar-section-title i {
+            font-size: 0.7rem;
+            transition: transform 0.2s ease;
+        }
+
+        .sidebar-section.collapsed .sidebar-section-title i {
+            transform: rotate(-90deg);
+        }
+
+        .sidebar-section-content {
+            max-height: 500px;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .sidebar-section.collapsed .sidebar-section-content {
+            max-height: 0;
+        }
+
+        .sidebar-footer {
+            padding: 0.75rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .sidebar-user { color: var(--secondary-color); font-weight: 500; }
+
+        .content { flex: 1 1 auto; display: flex; flex-direction: column; }
+        .content-topbar {
+            position: sticky;
+            top: 0;
+            background: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.5rem;
+            z-index: 1010;
+        }
+
+        /* Collapsed state adjustments */
+        body.sidebar-collapsed .sidebar .sidebar-section-title { display: none; }
+        body.sidebar-collapsed .sidebar .sidebar-sublink span { display: none; }
+        body.sidebar-collapsed .sidebar .sidebar-link span { display: none; }
+        body.sidebar-collapsed .sidebar .sidebar-sublink i,
+        body.sidebar-collapsed .sidebar .sidebar-link i { margin-right: 0; }
+
+        @media (max-width: 992px) {
+            .sidebar { position: fixed; left: 0; transform: translateX(-100%); transition: transform 0.2s ease; }
+            .sidebar.open { transform: translateX(0); }
+            .content-topbar { display: flex; justify-content: space-between; align-items: center; }
+        }
+
+        /* Mobile backdrop */
+        .sidebar-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.35);
+            z-index: 1015; /* below sidebar (1020) */
+            display: none;
+        }
+        body.sidebar-open .sidebar-backdrop { display: block; }
+
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.4rem;
+            color: var(--primary-color) !important;
+            display: flex;
+            align-items: center;
+        }
+        .brand-stack {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            line-height: 1.1;
+        }
+
+        .brand-stack .brand-text {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-top: 0.15rem;
+        }
+
+        .navbar-brand img {
+            height: 40px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .navbar-nav .nav-link {
+            color: var(--secondary-color) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+            background-color: var(--light-bg);
+            color: var(--primary-color) !important;
+        }
+
+        .card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
+            background: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            color: var(--primary-color);
+            font-weight: 600;
+            padding: 1rem 1.25rem;
+        }
+
+        .btn {
+            border-radius: 6px;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: #333;
+            border-color: #333;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            border-color: var(--warning-color);
+            color: var(--primary-color);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+
+        .btn-info {
+            background-color: var(--info-color);
+            border-color: var(--info-color);
+        }
+
+        .table {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .table thead th {
+            background-color: var(--light-bg);
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--border-color);
+            font-weight: 600;
+            padding: 1rem 0.75rem;
+        }
+
+        .table tbody td {
+            padding: 0.75rem;
+            vertical-align: middle;
+        }
+
+        .stats-card {
+            background: var(--white);
+            color: var(--primary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .stats-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .stats-card h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--primary-color);
+        }
+
+        .stats-card p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .stats-card i {
+            color: var(--secondary-color);
+            opacity: 0.7;
+        }
+
+        .alert {
+            border: 1px solid transparent;
+            border-radius: 6px;
+            border-left: 4px solid;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            border-left-color: var(--success-color);
+            color: #155724;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            border-left-color: var(--danger-color);
+            color: #721c24;
+        }
+
+        .form-control {
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(26, 26, 26, 0.25);
+        }
+
+        .badge {
+            border-radius: 4px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 1rem 0;
+        }
+
+        .footer {
+            background: var(--white);
+            color: var(--text-muted);
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .progress {
+            height: 8px;
+            border-radius: 4px;
+            background-color: var(--light-bg);
+        }
+
+        .progress-bar {
+            border-radius: 4px;
+        }
+
+        .list-group-item {
+            border: 1px solid var(--border-color);
+            padding: 0.75rem 1rem;
+        }
+
+        .list-group-item:first-child {
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+        }
+
+        .list-group-item:last-child {
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Sidebar Layout -->
+    <div class="app-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('index') }}" class="sidebar-brand">
+                    <img src="{{ url_for('static', filename='ases-removebg-preview.png') }}" alt="Ases Logo">
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <a class="sidebar-link" href="{{ url_for('index') }}">
+                    <i class="fas fa-home me-2"></i>Ana Sayfa
+                </a>
+                <a class="sidebar-link" href="{{ url_for('products') }}">
+                    <i class="fas fa-boxes me-2"></i>Ürünler
+                </a>
+                <a class="sidebar-link" href="{{ url_for('chargers') }}">
+                    <i class="fas fa-battery-full me-2"></i>Şarj Cihazları
+                </a>
+                <a class="sidebar-link" href="{{ url_for('movements') }}">
+                    <i class="fas fa-exchange-alt me-2"></i>Hareketler
+                </a>
+                <div class="sidebar-section" id="productSection">
+                    <div class="sidebar-section-title">
+                        <span>Ürün İşlemleri</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="sidebar-section-content">
+                        <a class="sidebar-sublink" href="{{ url_for('add_product') }}">
+                            <i class="fas fa-plus me-2"></i>Ürün Ekle
+                        </a>
+                        <a class="sidebar-sublink" href="{{ url_for('exit_product') }}">
+                            <i class="fas fa-minus me-2"></i>Ürün Çıkışı
+                        </a>
+                        <a class="sidebar-sublink" href="{{ url_for('bulk_import') }}">
+                            <i class="fas fa-file-excel me-2"></i>Toplu Giriş
+                        </a>
+                    </div>
+                </div>
+                <a class="sidebar-link" href="{{ url_for('analytics') }}">
+                    <i class="fas fa-chart-line me-2"></i>Analizler
+                </a>
+                {% if current_user.is_admin %}
+                <a class="sidebar-link" href="{{ url_for('users') }}">
+                    <i class="fas fa-users me-2"></i>Kullanıcılar
+                </a>
+                {% endif %}
+            </nav>
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <i class="fas fa-user me-2"></i>
+                    <span>{{ current_user.username }}</span>
+                </div>
+                <a class="btn btn-sm btn-outline-secondary w-100 mt-2" href="{{ url_for('logout') }}">
+                    <i class="fas fa-sign-out-alt me-1"></i>Çıkış Yap
+                </a>
+            </div>
+        </aside>
+        <div class="content">
+            <div class="content-topbar">
+                <button class="btn btn-outline-secondary btn-sm d-lg-none" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <!-- Flash Messages -->
+            <div class="container mt-2">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+            <!-- Main Content -->
+            <main class="container mt-3">
+                {% block content %}{% endblock %}
+            </main>
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="container">
+                    <p>&copy; 2024 Stok Takip Sistemi. Tüm hakları saklıdır.</p>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {% block extra_js %}{% endblock %}
+    <script>
+    (function() {
+        const sidebar = document.getElementById('sidebar');
+        const toggle = document.getElementById('sidebarToggle');
+        let isMobile = window.matchMedia('(max-width: 992px)');
+
+        // Backdrop element for mobile
+        const backdrop = document.createElement('div');
+        backdrop.className = 'sidebar-backdrop';
+        document.body.appendChild(backdrop);
+
+        function openMobileSidebar() {
+            sidebar.classList.add('open');
+            document.body.classList.add('sidebar-open');
+        }
+
+        function closeMobileSidebar() {
+            sidebar.classList.remove('open');
+            document.body.classList.remove('sidebar-open');
+        }
+
+        function toggleDesktopCollapse() {
+            sidebar.classList.toggle('collapsed');
+            document.body.classList.toggle('sidebar-collapsed');
+        }
+
+        if (toggle && sidebar) {
+            toggle.addEventListener('click', function() {
+                if (isMobile.matches) {
+                    if (sidebar.classList.contains('open')) closeMobileSidebar(); else openMobileSidebar();
+                } else {
+                    toggleDesktopCollapse();
+                }
+            });
+        }
+
+        // Close when clicking backdrop (mobile)
+        backdrop.addEventListener('click', closeMobileSidebar);
+
+        // Close on ESC (mobile)
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && isMobile.matches && sidebar.classList.contains('open')) {
+                closeMobileSidebar();
+            }
+        });
+
+        // Reset states on resize
+        window.addEventListener('resize', function() {
+            isMobile = window.matchMedia('(max-width: 992px)');
+            if (!isMobile.matches) {
+                // Leaving mobile: ensure backdrop closed and sidebar not open
+                closeMobileSidebar();
+            }
+        });
+
+        // Toggle collapsible sections
+        const productSection = document.getElementById('productSection');
+        if (productSection) {
+            const sectionTitle = productSection.querySelector('.sidebar-section-title');
+            sectionTitle.addEventListener('click', function() {
+                productSection.classList.toggle('collapsed');
+            });
+        }
+    })();
+    </script>
+</body>
+</html>

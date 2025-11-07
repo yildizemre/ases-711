@@ -1,0 +1,716 @@
+{% extends "base.html" %}
+
+{% block title %}Kullanıcı Ekle - Ases Stok Takip{% endblock %}
+
+{% block content %}
+<!-- Modern Header -->
+<div class="add-user-header">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="add-user-title">
+                    <i class="fas fa-user-plus"></i>
+                    Yeni Kullanıcı Ekle
+                </h1>
+                <p class="add-user-subtitle">
+                    Sisteme yeni kullanıcı ekleyin ve yetkilerini belirleyin
+                </p>
+            </div>
+            <div class="col-md-4">
+                <div class="add-user-actions">
+                    <a href="{{ url_for('users') }}" class="btn-modern btn-outline">
+                        <i class="fas fa-arrow-left"></i>
+                        Kullanıcı Listesi
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Ana Form -->
+        <div class="col-lg-8">
+            <div class="modern-card">
+                <div class="card-header-modern">
+                    <h3 class="card-title-modern">
+                        <i class="fas fa-user-plus"></i>
+                        Kullanıcı Bilgileri
+                    </h3>
+                    <p class="card-subtitle-modern">
+                        Yeni kullanıcı için gerekli bilgileri doldurun
+                    </p>
+                </div>
+                <div class="card-body-modern">
+                    <form method="POST" class="modern-form">
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label for="username" class="field-label">
+                                    <i class="fas fa-user"></i>
+                                    Kullanıcı Adı
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="input-group-modern">
+                                    <input type="text" class="form-control-modern" id="username" name="username" 
+                                           placeholder="Kullanıcı adı girin" required>
+                                </div>
+                                <div class="field-help">Benzersiz olmalıdır (min 3 karakter)</div>
+                            </div>
+                            
+                            <div class="form-field">
+                                <label for="email" class="field-label">
+                                    <i class="fas fa-envelope"></i>
+                                    Email Adresi
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="input-group-modern">
+                                    <input type="email" class="form-control-modern" id="email" name="email" 
+                                           placeholder="email@example.com" required>
+                                </div>
+                                <div class="field-help">Geçerli ve benzersiz email adresi</div>
+                            </div>
+                            
+                            <div class="form-field">
+                                <label for="password" class="field-label">
+                                    <i class="fas fa-lock"></i>
+                                    Şifre
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="input-group-modern">
+                                    <input type="password" class="form-control-modern" id="password" name="password" 
+                                           placeholder="Güçlü bir şifre girin" required>
+                                </div>
+                                <div class="field-help">En az 6 karakter olmalıdır</div>
+                            </div>
+                            
+                            <div class="form-field full-width">
+                                <div class="permission-section">
+                                    <label class="field-label">
+                                        <i class="fas fa-shield-alt"></i>
+                                        Yetki Seviyesi
+                                    </label>
+                                    <div class="permission-options">
+                                        <div class="permission-option">
+                                            <input type="checkbox" id="is_admin" name="is_admin" class="permission-checkbox">
+                                            <label for="is_admin" class="permission-label">
+                                                <div class="permission-icon">
+                                                    <i class="fas fa-crown"></i>
+                                                </div>
+                                                <div class="permission-content">
+                                                    <h6>Admin Yetkisi</h6>
+                                                    <p>Tüm özelliklere erişim ve kullanıcı yönetimi</p>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="field-help">
+                                        Admin kullanıcılar tüm özelliklere erişebilir ve kullanıcı yönetimi yapabilir
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <a href="{{ url_for('users') }}" class="btn-modern btn-outline">
+                                <i class="fas fa-arrow-left"></i>
+                                İptal
+                            </a>
+                            <button type="submit" class="btn-modern btn-success">
+                                <i class="fas fa-save"></i>
+                                Kullanıcıyı Kaydet
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Yardım Kartı -->
+        <div class="col-lg-4">
+            <div class="modern-card">
+                <div class="card-header-modern">
+                    <h3 class="card-title-modern">
+                        <i class="fas fa-info-circle"></i>
+                        Kullanıcı Ekleme Rehberi
+                    </h3>
+                </div>
+                <div class="card-body-modern">
+                    <div class="help-grid">
+                        <div class="help-section">
+                            <h6 class="help-title">
+                                <i class="fas fa-check-circle"></i>
+                                Gerekli Bilgiler
+                            </h6>
+                            <div class="help-list">
+                                <div class="help-item">
+                                    <i class="fas fa-check"></i>
+                                    <span>Benzersiz kullanıcı adı</span>
+                                </div>
+                                <div class="help-item">
+                                    <i class="fas fa-check"></i>
+                                    <span>Geçerli email adresi</span>
+                                </div>
+                                <div class="help-item">
+                                    <i class="fas fa-check"></i>
+                                    <span>Güçlü şifre (min 6 karakter)</span>
+                                </div>
+                                <div class="help-item">
+                                    <i class="fas fa-check"></i>
+                                    <span>Yetki seviyesi (opsiyonel)</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="help-section">
+                            <h6 class="help-title">
+                                <i class="fas fa-users-cog"></i>
+                                Yetki Seviyeleri
+                            </h6>
+                            <div class="permission-cards">
+                                <div class="permission-card normal">
+                                    <div class="permission-card-header">
+                                        <i class="fas fa-user"></i>
+                                        <h6>Normal Kullanıcı</h6>
+                                    </div>
+                                    <ul class="permission-list">
+                                        <li>Ürün görüntüleme</li>
+                                        <li>Hareket görüntüleme</li>
+                                        <li>Çıkış yapma</li>
+                                        <li>Analiz görüntüleme</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="permission-card admin">
+                                    <div class="permission-card-header">
+                                        <i class="fas fa-crown"></i>
+                                        <h6>Admin Kullanıcı</h6>
+                                    </div>
+                                    <ul class="permission-list">
+                                        <li>Tüm normal yetkiler</li>
+                                        <li>Ürün ekleme/düzenleme</li>
+                                        <li>Kullanıcı yönetimi</li>
+                                        <li>Sistem ayarları</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="help-section">
+                            <h6 class="help-title">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Önemli Notlar
+                            </h6>
+                            <div class="help-list">
+                                <div class="help-item warning">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <span>Email adresi benzersiz olmalıdır</span>
+                                </div>
+                                <div class="help-item info">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <span>Şifreler güvenli şekilde saklanır</span>
+                                </div>
+                                <div class="help-item primary">
+                                    <i class="fas fa-edit"></i>
+                                    <span>Kullanıcı bilgileri daha sonra güncellenebilir</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Modern Add User Page Styles */
+.add-user-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.add-user-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.add-user-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0.5rem 0 0 0;
+    font-weight: 400;
+}
+
+.add-user-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-modern {
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-modern.btn-success {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.btn-modern.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-modern.btn-outline {
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255,255,255,0.3);
+}
+
+.btn-modern.btn-outline:hover {
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.5);
+    color: white;
+    text-decoration: none;
+}
+
+/* Modern Cards */
+.modern-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.modern-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+}
+
+.card-header-modern {
+    padding: 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    background: #fafbfc;
+}
+
+.card-title-modern {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.card-subtitle-modern {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 0.5rem 0 0 0;
+}
+
+.card-body-modern {
+    padding: 1.5rem;
+}
+
+/* Modern Form */
+.modern-form {
+    margin: 0;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-field.full-width {
+    grid-column: 1 / -1;
+}
+
+.field-label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.875rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.required {
+    color: #ef4444;
+    margin-left: 0.25rem;
+}
+
+.input-group-modern {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.form-control-modern {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form-control-modern:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.field-help {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+/* Permission Section */
+.permission-section {
+    background: #f8fafc;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.permission-options {
+    margin-top: 1rem;
+}
+
+.permission-option {
+    margin-bottom: 1rem;
+}
+
+.permission-checkbox {
+    display: none;
+}
+
+.permission-label {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    gap: 1rem;
+}
+
+.permission-checkbox:checked + .permission-label {
+    border-color: #4f46e5;
+    background: #f0f4ff;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.permission-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+}
+
+.permission-content h6 {
+    margin: 0 0 0.25rem 0;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.permission-content p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+/* Help Grid */
+.help-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.help-section {
+    background: #f8fafc;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.help-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.help-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.help-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    color: #374151;
+}
+
+.help-item i {
+    width: 16px;
+    text-align: center;
+}
+
+.help-item.warning i {
+    color: #f59e0b;
+}
+
+.help-item.info i {
+    color: #3b82f6;
+}
+
+.help-item.primary i {
+    color: #8b5cf6;
+}
+
+/* Permission Cards */
+.permission-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.permission-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+}
+
+.permission-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.permission-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.permission-card-header i {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.875rem;
+}
+
+.permission-card.normal .permission-card-header i {
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+}
+
+.permission-card.admin .permission-card-header i {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.permission-card-header h6 {
+    margin: 0;
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 0.875rem;
+}
+
+.permission-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.permission-list li {
+    font-size: 0.75rem;
+    color: #64748b;
+    padding: 0.25rem 0;
+    position: relative;
+    padding-left: 1rem;
+}
+
+.permission-list li:before {
+    content: "•";
+    color: #10b981;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .add-user-header {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .add-user-title {
+        font-size: 2rem;
+    }
+    
+    .add-user-actions {
+        flex-direction: column;
+        width: 100%;
+        margin-top: 1rem;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .permission-cards {
+        flex-direction: column;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Şifre güçlülük kontrolü
+document.getElementById('password').addEventListener('input', function() {
+    const password = this.value;
+    const strength = getPasswordStrength(password);
+    
+    // Şifre güçlülük göstergesi (basit)
+    if (password.length >= 6) {
+        this.classList.remove('is-invalid');
+        this.classList.add('is-valid');
+    } else {
+        this.classList.remove('is-valid');
+        this.classList.add('is-invalid');
+    }
+});
+
+function getPasswordStrength(password) {
+    let strength = 0;
+    
+    if (password.length >= 6) strength++;
+    if (password.length >= 8) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+    
+    return strength;
+}
+
+// Email format kontrolü
+document.getElementById('email').addEventListener('blur', function() {
+    const email = this.value;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    if (email && !emailRegex.test(email)) {
+        this.classList.add('is-invalid');
+    } else {
+        this.classList.remove('is-invalid');
+    }
+});
+
+// Kullanıcı adı benzersizlik kontrolü
+document.getElementById('username').addEventListener('blur', function() {
+    const username = this.value;
+    
+    if (username && username.length < 3) {
+        this.classList.add('is-invalid');
+    } else {
+        this.classList.remove('is-invalid');
+    }
+});
+
+// Form validasyonu
+document.querySelector('form').addEventListener('submit', function(e) {
+    const username = document.getElementById('username').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    
+    if (!username || username.length < 3) {
+        e.preventDefault();
+        alert('Kullanıcı adı en az 3 karakter olmalıdır!');
+        return;
+    }
+    
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        e.preventDefault();
+        alert('Geçerli bir email adresi girin!');
+        return;
+    }
+    
+    if (!password || password.length < 6) {
+        e.preventDefault();
+        alert('Şifre en az 6 karakter olmalıdır!');
+        return;
+    }
+    
+    // Onay mesajı
+    if (!confirm('Yeni kullanıcıyı eklemek istediğinizden emin misiniz?')) {
+        e.preventDefault();
+    }
+});
+</script>
+{% endblock %}

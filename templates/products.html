@@ -1,0 +1,799 @@
+{% extends "base.html" %}
+
+{% block title %}Ürünler - Ases Stok Takip{% endblock %}
+
+{% block content %}
+<!-- Modern Header -->
+<div class="products-header">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h1 class="products-title">Ürün Yönetimi</h1>
+            <p class="products-subtitle">Tüm ürünlerinizi görüntüleyin, düzenleyin ve yönetin</p>
+        </div>
+        <div class="products-actions">
+            <a href="{{ url_for('devices') }}" class="btn-modern btn-outline me-2">
+                <i class="fas fa-laptop me-2"></i>Cihazlar
+            </a>
+            <a href="{{ url_for('export_products_excel') }}?search={{ request.args.get('search', '') }}&brand={{ request.args.get('brand', '') }}&model={{ request.args.get('model', '') }}" 
+               class="btn-modern btn-outline me-2">
+                <i class="fas fa-file-excel me-2"></i>Excel İndir
+            </a>
+            <a href="{{ url_for('add_product') }}" class="btn-modern btn-primary">
+                <i class="fas fa-plus me-2"></i>Yeni Ürün Ekle
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Modern Arama ve Filtreler -->
+<div class="modern-card mb-5">
+    <div class="card-header-modern">
+        <div class="header-content">
+            <h5 class="card-title-modern">
+                <i class="fas fa-search me-3"></i>Arama ve Filtreler
+            </h5>
+            <p class="card-subtitle-modern">Ürünleri marka, model veya diğer kriterlere göre filtreleyin</p>
+        </div>
+    </div>
+    <div class="card-body-modern">
+        <form method="GET" class="search-form" id="productsSearchForm">
+            <div class="search-grid">
+                <div class="search-field">
+                    <label for="search" class="field-label">Arama</label>
+                    <div class="input-group-modern">
+                        <i class="fas fa-search input-icon" id="searchIcon"></i>
+                        <input type="text" class="form-control-modern" id="search" name="search" 
+                               placeholder="Marka, model, barkod veya seri no..." 
+                               value="{{ request.args.get('search', '') }}">
+                        <div class="search-loading" id="searchLoading" style="display: none;">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                        <button type="button" id="searchBtn" class="btn-modern btn-primary" style="margin-left: 0.5rem;">
+                            <i class="fas fa-search me-2"></i>Ara
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="search-field">
+                    <label for="brand" class="field-label">Marka</label>
+                    <div class="select-group-modern">
+                        <i class="fas fa-tag select-icon"></i>
+                        <select class="form-select-modern" id="brand" name="brand">
+                            <option value="">Tüm Markalar</option>
+                            {% for brand, total in brands_with_counts %}
+                            <option value="{{ brand }}" 
+                                    {% if request.args.get('brand') == brand %}selected{% endif %}>
+                                {{ brand }} (adet {{ total }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="search-field">
+                    <label for="model" class="field-label">Model</label>
+                    <div class="select-group-modern">
+                        <i class="fas fa-cube select-icon"></i>
+                        <select class="form-select-modern" id="model" name="model">
+                            <option value="">Tüm Modeller</option>
+                            {% for m, total in models_with_counts %}
+                            <option value="{{ m }}" 
+                                    {% if request.args.get('model') == m %}selected{% endif %}>
+                                {{ m }} (adet {{ total }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="search-actions">
+                    <a href="{{ url_for('products') }}" class="btn-modern btn-outline">
+                        <i class="fas fa-times me-2"></i>Temizle
+                    </a>
+                    <div class="results-count">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <span id="resultsCount">Arama yapın...</span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Bilgi Mesajı -->
+<div class="alert alert-info mb-3" role="alert">
+    <i class="fas fa-info-circle me-2"></i>
+    <strong>Bilgi:</strong> Bu sayfada sadece stokta olan ürünler (adet > 0) gösterilmektedir. Stokta kalmayan ürünler otomatik olarak gizlenir.
+</div>
+
+<!-- Aktif Filtreler -->
+{% if request.args.get('brand') or request.args.get('model') or request.args.get('search') %}
+<div class="card mb-3">
+    <div class="card-body">
+        <h6 class="mb-2"><i class="fas fa-filter me-2"></i>Aktif Filtreler:</h6>
+        <div class="d-flex flex-wrap gap-2">
+            {% if request.args.get('brand') %}
+            <span class="badge bg-primary">
+                Marka: {{ request.args.get('brand') }}
+                <a href="{{ url_for('products', model=request.args.get('model', ''), search=request.args.get('search', '')) }}" 
+                   class="text-white ms-1">×</a>
+            </span>
+            {% endif %}
+            {% if request.args.get('model') %}
+            <span class="badge bg-info">
+                Model: {{ request.args.get('model') }}
+                <a href="{{ url_for('products', brand=request.args.get('brand', ''), search=request.args.get('search', '')) }}" 
+                   class="text-white ms-1">×</a>
+            </span>
+            {% endif %}
+            {% if request.args.get('search') %}
+            <span class="badge bg-warning text-dark">
+                Arama: {{ request.args.get('search') }}
+                <a href="{{ url_for('products', brand=request.args.get('brand', ''), model=request.args.get('model', '')) }}" 
+                   class="text-dark ms-1">×</a>
+            </span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Modern Ürünler Tablosu -->
+<div class="modern-card">
+    <div class="card-header-modern">
+        <div class="header-content">
+            <h5 class="card-title-modern">
+                <i class="fas fa-list me-3"></i>Ürün Listesi
+            </h5>
+            <p class="card-subtitle-modern">{{ products|length }} ürün bulundu</p>
+        </div>
+        
+    </div>
+    <div class="card-body-modern">
+        {% if products %}
+        <!-- Table View Only -->
+        <div class="table-view" id="tableView">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle table-modern">
+                    <thead>
+                        <tr>
+                            <th>Marka</th>
+                            <th>Model</th>
+                            <th>Barkod</th>
+                            <th>Seri No</th>
+                            <th>Stok</th>
+                            <th>Tarih</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('products', brand=product.marka, model=request.args.get('model', ''), search=request.args.get('search', '')) }}" 
+                                   class="link-modern">
+                                    <strong>{{ product.marka }}</strong>
+                                </a>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('products', brand=request.args.get('brand', ''), model=product.model, search=request.args.get('search', '')) }}" 
+                                   class="link-modern">
+                                    {{ product.model }}
+                                </a>
+                            </td>
+                            <td><code class="code-modern">{{ product.barkod }}</code></td>
+                            <td><code class="code-modern">{{ product.seri_no }}</code></td>
+                            <td>
+                                <span class="badge-modern {% if product.adet > 10 %}success{% elif product.adet > 0 %}warning{% else %}danger{% endif %}">
+                                    {{ product.adet }}
+                                </span>
+                            </td>
+                            <td>{{ product.created_at.strftime('%d.%m.%Y') }}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary"
+                                            data-bs-toggle="modal" data-bs-target="#productModal{{ product.id }}"
+                                            title="Detayları Gör">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <a href="{{ url_for('exit_product') }}?product_id={{ product.id }}" 
+                                       class="btn btn-sm btn-outline-warning" title="Çıkış Yap">
+                                        <i class="fas fa-minus"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
+            <h5 class="text-muted">Ürün bulunamadı</h5>
+            <p class="text-muted">Arama kriterlerinize uygun ürün bulunmuyor.</p>
+            <a href="{{ url_for('add_product') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>İlk Ürünü Ekle
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Ürün Detay Modalları -->
+{% for product in products %}
+<div class="modal fade" id="productModal{{ product.id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-box me-2"></i>{{ product.marka }} {{ product.model }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Ürün Bilgileri</h6>
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Marka:</strong></td>
+                                <td>{{ product.marka }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Model:</strong></td>
+                                <td>{{ product.model }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Barkod:</strong></td>
+                                <td><code>{{ product.barkod }}</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Seri No:</strong></td>
+                                <td><code>{{ product.seri_no }}</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Mevcut Adet:</strong></td>
+                                <td>
+                                    <span class="badge {% if product.adet > 10 %}bg-success{% elif product.adet > 0 %}bg-warning{% else %}bg-danger{% endif %} fs-6">
+                                        {{ product.adet }}
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Son Hareketler</h6>
+                        {% if product.movements %}
+                        <div class="table-responsive" style="max-height: 300px;">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Tarih</th>
+                                        <th>Tür</th>
+                                        <th>Adet</th>
+                                        <th>Açıklama</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for movement in product.movements[-5:] %}
+                                    <tr>
+                                        <td>{{ movement.tarih.strftime('%d.%m %H:%M') }}</td>
+                                        <td>
+                                            {% if movement.movement_type == 'giris' %}
+                                                <span class="badge bg-success">Giriş</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Çıkış</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ movement.adet }}</td>
+                                        <td>{{ movement.aciklama[:30] }}{% if movement.aciklama|length > 30 %}...{% endif %}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <p class="text-muted">Henüz hareket kaydı bulunmuyor.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="{{ url_for('exit_product') }}?product_id={{ product.id }}" 
+                   class="btn btn-warning">
+                    <i class="fas fa-minus me-1"></i>Çıkış Yap
+                </a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Modern Products Page Styles */
+.products-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.products-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.products-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0.5rem 0 0 0;
+    font-weight: 400;
+}
+
+.products-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-modern {
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-modern.btn-primary {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: white;
+}
+
+.btn-modern.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-modern.btn-outline {
+    background: white;
+    color: #1f2937;
+    border: 2px solid #e5e7eb;
+    font-weight: 600;
+}
+
+.btn-modern.btn-outline:hover {
+    background: #f9fafb;
+    border-color: #4f46e5;
+    color: #4f46e5;
+    text-decoration: none;
+}
+
+/* Search Form */
+.search-form {
+    margin: 0;
+}
+
+.search-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr auto;
+    gap: 1.5rem;
+    align-items: end;
+}
+
+.search-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.field-label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+.input-group-modern {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 1rem;
+    color: #9ca3af;
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.search-loading {
+    position: absolute;
+    right: 1rem;
+    color: #4f46e5;
+    z-index: 2;
+}
+
+.form-control-modern {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form-control-modern:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.form-control-modern:focus + .search-loading {
+    display: block;
+}
+
+.select-group-modern {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.select-icon {
+    position: absolute;
+    left: 1rem;
+    color: #9ca3af;
+    z-index: 2;
+}
+
+.form-select-modern {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    background: white;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+}
+
+.form-select-modern:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.search-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.results-count {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.results-count i {
+    color: #4f46e5;
+}
+
+/* Modern Cards */
+.modern-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.modern-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+}
+
+.card-header-modern {
+    padding: 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    background: #fafbfc;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-title-modern {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.card-subtitle-modern {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 0.5rem 0 0 0;
+}
+
+.card-body-modern {
+    padding: 1.5rem;
+}
+
+/* Removed grid and card styles for single list view */
+
+/* Table View */
+/* Table aligns with Bootstrap look; keep light custom touches */
+.table-modern {
+    width: 100%;
+    font-size: 0.875rem;
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table-modern th {
+    background: #f8f9fa;
+    color: #212529;
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.table-modern td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f8f9fa;
+    vertical-align: middle;
+    background: #ffffff;
+}
+
+.table-modern tr:hover {
+    background: #f8fafc;
+}
+
+.link-modern {
+    color: #0d6efd;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.link-modern:hover {
+    color: #0a58ca;
+    text-decoration: underline;
+}
+
+.code-modern {
+    background: #f8f9fa;
+    color: #212529;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    border: 1px solid #e9ecef;
+}
+
+.badge-modern {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid transparent;
+}
+
+.badge-modern.success { background: #e9f7ef; color: #155724; border-color: #c3e6cb; }
+.badge-modern.warning { background: #fff3cd; color: #856404; border-color: #ffeeba; }
+.badge-modern.danger  { background: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* use Bootstrap btns above; keep spacing only */
+
+/* Subtle row shadow on hover */
+.table-modern tbody tr {
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.table-modern tbody tr:hover {
+    box-shadow: inset 0 1px 0 #e5e7eb, inset 0 -1px 0 #e5e7eb;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #64748b;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .products-header {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .products-title {
+        font-size: 2rem;
+    }
+    
+    .products-actions {
+        flex-direction: column;
+        width: 100%;
+        margin-top: 1rem;
+    }
+    
+    .search-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .search-actions {
+        justify-content: center;
+    }
+    
+    .products-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .product-footer {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+    
+    .product-actions {
+        align-self: flex-end;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// View Toggle Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Search behavior: only on explicit submit/click
+    const searchInput = document.getElementById('search');
+    const brandSelect = document.getElementById('brand');
+    const modelSelect = document.getElementById('model');
+    const form = document.getElementById('productsSearchForm');
+    const searchBtn = document.getElementById('searchBtn');
+    
+    // No auto-search while typing; only submit triggers search
+
+    // Brand/Model değişince hemen filtrele
+    if (brandSelect) {
+        brandSelect.addEventListener('change', function() {
+            performSearch();
+        });
+    }
+    if (modelSelect) {
+        modelSelect.addEventListener('change', function() {
+            performSearch();
+        });
+    }
+
+    // Block Enter key from submitting or triggering search
+    if (searchInput) {
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+            }
+        });
+    }
+
+    // Prevent any form submit default behavior
+    if (form) {
+        form.addEventListener('submit', function(e) { e.preventDefault(); });
+    }
+
+    // Only button click triggers search
+    if (searchBtn) {
+        searchBtn.addEventListener('click', function() {
+            performSearch();
+        });
+    }
+    
+    function performSearch() {
+        const formData = new FormData(form);
+        const params = new URLSearchParams();
+        
+        // Form verilerini URL parametrelerine çevir
+        for (let [key, value] of formData.entries()) {
+            if (value.trim() !== '') {
+                params.append(key, value);
+            }
+        }
+        
+        // Mevcut URL'yi güncelle ve sayfayı yenile
+        const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+        window.location.href = newUrl;
+    }
+    
+    // Arama input'una focus olduğunda placeholder'ı temizle
+    if (searchInput) {
+        searchInput.addEventListener('focus', function() {
+            this.placeholder = '';
+        });
+        
+        searchInput.addEventListener('blur', function() {
+            if (this.value === '') {
+                this.placeholder = 'Marka, model, barkod veya seri no...';
+            }
+        });
+    }
+    
+    // Klavye kısayolları
+    document.addEventListener('keydown', function(e) {
+        // Ctrl + F ile arama input'una focus
+        if (e.ctrlKey && e.key === 'f') {
+            e.preventDefault();
+            if (searchInput) {
+                searchInput.focus();
+                searchInput.select();
+            }
+        }
+        
+        // Escape ile aramayı temizle
+        if (e.key === 'Escape') {
+            if (searchInput && searchInput.value !== '') {
+                searchInput.value = '';
+                // Do not auto-search on escape; user can press Enter or click Ara
+            }
+        }
+    });
+    
+    // Arama sonuçları sayısını göster
+    function updateResultsCount() {
+        const resultsCount = document.getElementById('resultsCount');
+        if (resultsCount) {
+            // Tablo satırlarını say
+            const tableRows = document.querySelectorAll('.table-modern tbody tr');
+            const productCount = tableRows.length;
+            
+            if (productCount > 0) {
+                resultsCount.textContent = `${productCount} ürün bulundu`;
+            } else {
+                resultsCount.textContent = 'Ürün bulunamadı';
+            }
+        }
+    }
+    
+    // Sayfa yüklendiğinde sonuç sayısını güncelle
+    updateResultsCount();
+});
+</script>
+{% endblock %}

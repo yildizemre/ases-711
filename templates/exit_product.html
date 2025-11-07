@@ -1,0 +1,930 @@
+{% extends "base.html" %}
+
+{% block title %}Çıkış Yap - Ases Stok Takip{% endblock %}
+
+{% block content %}
+
+<!-- Modern Header -->
+<div class="exit-product-header">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h1 class="exit-product-title">Ürün Çıkışı</h1>
+            <p class="exit-product-subtitle">Stoktan ürün çıkışı yapın</p>
+        </div>
+        <div class="exit-product-actions">
+            <a href="{{ url_for('products') }}" class="btn-modern btn-outline">
+                <i class="fas fa-arrow-left me-2"></i>Geri Dön
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="modern-card">
+            <div class="card-header-modern">
+                <div class="header-content">
+                    <h5 class="card-title-modern">
+                        <i class="fas fa-minus me-3"></i>Çıkış Bilgileri
+                    </h5>
+                    <p class="card-subtitle-modern">Çıkış yapılacak ürünü seçin ve bilgileri girin</p>
+                </div>
+            </div>
+            <div class="card-body-modern">
+                <form method="POST" class="modern-form">
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label for="product_search" class="field-label">
+                                <i class="fas fa-box me-2"></i>Ürün Seçin <span class="required">*</span>
+                            </label>
+                            <div class="product-search-container">
+                                <div class="input-group-modern">
+                                    <span class="input-group-text-modern">
+                                        <i class="fas fa-search"></i>
+                                    </span>
+                                    <input type="text" 
+                                           class="form-control-modern" 
+                                           id="product_search" 
+                                           placeholder="Marka, model, seri no veya barkod ile arayın..."
+                                           autocomplete="off">
+                                    <input type="hidden" id="product_id" name="product_id" required>
+                                </div>
+                                <div class="product-dropdown" id="product_dropdown" style="display: none;">
+                                    <div class="dropdown-header">
+                                        <span class="dropdown-title">Ürünler</span>
+                                        <span class="dropdown-count" id="product_count">0 ürün bulundu</span>
+                                    </div>
+                                    <div class="dropdown-content" id="product_list">
+                                        <!-- Ürünler JavaScript ile yüklenecek -->
+                                    </div>
+                                </div>
+                                <div class="selected-product" id="selected_product" style="display: none;">
+                                    <div class="selected-info">
+                                        <div class="selected-main">
+                                            <span class="selected-name" id="selected_name"></span>
+                                            <span class="selected-stock" id="selected_stock"></span>
+                                        </div>
+                                        <div class="selected-details" id="selected_details"></div>
+                                    </div>
+                                    <button type="button" class="btn-clear-selection" id="clear_selection">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {% if not products %}
+                            <div class="field-warning">
+                                <i class="fas fa-exclamation-triangle me-1"></i>
+                                Stokta ürün bulunmuyor. Önce ürün ekleyin.
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-field">
+                            <label for="adet" class="field-label">
+                                <i class="fas fa-cubes me-2"></i>Çıkış Adedi <span class="required">*</span>
+                            </label>
+                            <div class="input-group-modern">
+                                <input type="number" class="form-control-modern" id="adet" name="adet" 
+                                       min="1" max="0" placeholder="Çıkış adedi" required>
+                            </div>
+                            <div class="field-help">
+                                Maksimum: <span id="maxAdet" class="text-primary fw-bold">0</span> adet
+                            </div>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label for="hasta_adi" class="field-label">
+                                <i class="fas fa-user me-2"></i>Teslim Edilen Hasta <span class="required">*</span>
+                            </label>
+                            <div class="input-group-modern">
+                                <input type="text" class="form-control-modern" id="hasta_adi" name="hasta_adi" 
+                                       placeholder="Hasta adı soyadı" required style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()">
+                            </div>
+                            <div class="field-help">Teslim edilen hastanın adı ve soyadı</div>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label for="verme_bildirimi" class="field-label">
+                                <i class="fas fa-bell me-2"></i>Verme Bildirimi <span class="required">*</span>
+                            </label>
+                            <div class="input-group-modern">
+                                <select class="form-control-modern" id="verme_bildirimi" name="verme_bildirimi" required>
+                                    <option value="">Seçiniz</option>
+                                    <option value="verildi">Verildi</option>
+                                    <option value="verilmedi">Verilmedi</option>
+                                </select>
+                            </div>
+                            <div class="field-help">Hastaya bildirim verilip verilmediği</div>
+                        </div>
+                        
+                        <div class="form-field full-width">
+                            <label for="aciklama" class="field-label">
+                                <i class="fas fa-comment me-2"></i>Açıklama
+                            </label>
+                            <div class="input-group-modern">
+                                <textarea class="form-control-modern" id="aciklama" name="aciklama" rows="3" 
+                                          placeholder="Çıkış nedeni, alıcı bilgisi vb. (opsiyonel)"></textarea>
+                            </div>
+                            <div class="field-help">Çıkış nedenini belirtmek için açıklama yazabilirsiniz.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <a href="{{ url_for('movements') }}" class="btn-modern btn-outline">
+                            <i class="fas fa-arrow-left me-2"></i>Geri Dön
+                        </a>
+                        <button type="submit" class="btn-modern btn-warning" {% if not products %}disabled{% endif %}>
+                            <i class="fas fa-minus me-2"></i>Çıkış Yap
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Seçilen Ürün Bilgileri -->
+        <div class="card mt-4" id="productInfo" style="display: none;">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Seçilen Ürün Bilgileri
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Marka:</strong></td>
+                                <td id="infoMarka">-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Model:</strong></td>
+                                <td id="infoModel">-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Barkod:</strong></td>
+                                <td><code id="infoBarkod">-</code></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Seri No:</strong></td>
+                                <td><code id="infoSeriNo">-</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Kategori:</strong></td>
+                                <td><span class="badge bg-info" id="infoKategori">-</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Mevcut Adet:</strong></td>
+                                <td><span class="badge bg-primary" id="infoAdet">-</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Yardım Kartı -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-question-circle me-2"></i>Çıkış Yapma Hakkında
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Çıkış Yapılabilir Ürünler:</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success me-2"></i>Stokta bulunan ürünler</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Adet > 0 olan ürünler</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Aktif durumda olan ürünler</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Önemli Notlar:</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-exclamation-triangle text-warning me-2"></i>Çıkış yapıldıktan sonra geri alınamaz</li>
+                            <li><i class="fas fa-info text-info me-2"></i>Stok adedi otomatik olarak düşer</li>
+                            <li><i class="fas fa-history text-primary me-2"></i>Hareket geçmişine kaydedilir</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Modern Exit Product Page Styles */
+.exit-product-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.exit-product-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.exit-product-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0.5rem 0 0 0;
+    font-weight: 400;
+}
+
+.exit-product-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-modern {
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-modern.btn-warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+}
+
+.btn-modern.btn-warning:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-modern.btn-outline {
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255,255,255,0.3);
+}
+
+.btn-modern.btn-outline:hover {
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.5);
+    color: white;
+    text-decoration: none;
+}
+
+/* Modern Cards */
+.modern-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.modern-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+}
+
+.card-header-modern {
+    padding: 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    background: #fafbfc;
+}
+
+.card-title-modern {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.card-subtitle-modern {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 0.5rem 0 0 0;
+}
+
+.card-body-modern {
+    padding: 1.5rem;
+}
+
+/* Modern Form */
+.modern-form {
+    margin: 0;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-field.full-width {
+    grid-column: 1 / -1;
+}
+
+.field-label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.875rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.required {
+    color: #ef4444;
+    margin-left: 0.25rem;
+}
+
+.input-group-modern {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.form-control-modern {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form-control-modern:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.select-group-modern {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.select-icon {
+    position: absolute;
+    left: 1rem;
+    color: #9ca3af;
+    z-index: 2;
+}
+
+.form-select-modern {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    background: white;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+}
+
+.form-select-modern:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Ürün Seçim Dropdown Stilleri */
+.form-select-modern option {
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    white-space: pre-line;
+}
+
+.form-select-modern option:hover {
+    background-color: #f3f4f6;
+}
+
+/* Dropdown genişliği ve yüksekliği */
+.select-group-modern {
+    position: relative;
+}
+
+.form-select-modern {
+    width: 100%;
+    min-height: 50px;
+    font-size: 0.875rem;
+}
+
+.field-help {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+.field-warning {
+    font-size: 0.75rem;
+    color: #f59e0b;
+    margin-top: 0.25rem;
+    display: flex;
+    align-items: center;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .exit-product-header {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .exit-product-title {
+        font-size: 2rem;
+    }
+    
+    .exit-product-actions {
+        flex-direction: column;
+        width: 100%;
+        margin-top: 1rem;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+/* Ürün Arama Stilleri */
+.product-search-container {
+    position: relative;
+    width: 100%;
+}
+
+.input-group-modern {
+    position: relative;
+    display: flex;
+    align-items: center;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.input-group-modern:focus-within {
+    border-color: #3498db;
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+.input-group-text-modern {
+    padding: 12px 15px;
+    background: #f8f9fa;
+    border: none;
+    border-radius: 12px 0 0 12px;
+    color: #6c757d;
+    font-size: 16px;
+}
+
+.form-control-modern {
+    flex: 1;
+    border: none;
+    padding: 12px 15px;
+    border-radius: 0 12px 12px 0;
+    font-size: 16px;
+    background: transparent;
+}
+
+.form-control-modern:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.product-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 2px solid #e9ecef;
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.dropdown-header {
+    padding: 12px 15px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dropdown-title {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 14px;
+}
+
+.dropdown-count {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.dropdown-content {
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.product-item {
+    padding: 12px 15px;
+    border-bottom: 1px solid #f1f3f4;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.product-item:hover {
+    background-color: #f8f9fa;
+}
+
+.product-item:last-child {
+    border-bottom: none;
+}
+
+.product-info {
+    flex: 1;
+}
+
+.product-name {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.product-details {
+    font-size: 12px;
+    color: #6c757d;
+    display: flex;
+    gap: 10px;
+}
+
+.product-stock {
+    background: #e8f5e8;
+    color: #27ae60;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.selected-product {
+    margin-top: 10px;
+    padding: 15px;
+    background: #e8f4fd;
+    border: 2px solid #3498db;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.selected-info {
+    flex: 1;
+}
+
+.selected-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.selected-name {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 16px;
+}
+
+.selected-stock {
+    background: #27ae60;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.selected-details {
+    font-size: 13px;
+    color: #6c757d;
+}
+
+.btn-clear-selection {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-clear-selection:hover {
+    background: #c0392b;
+    transform: scale(1.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .product-dropdown {
+        max-height: 250px;
+    }
+    
+    .product-item {
+        padding: 10px 12px;
+    }
+    
+    .product-name {
+        font-size: 13px;
+    }
+    
+    .product-details {
+        font-size: 11px;
+        flex-direction: column;
+        gap: 2px;
+    }
+    
+    .selected-product {
+        padding: 12px;
+    }
+    
+    .selected-name {
+        font-size: 14px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Ürün verilerini JavaScript'e aktar
+const products = [
+    {% for product in products %}
+    {
+        id: {{ product.id }},
+        marka: "{{ product.marka }}",
+        model: "{{ product.model }}",
+        barkod: "{{ product.barkod }}",
+        seri_no: "{{ product.seri_no }}",
+        kategori: "{{ product.kategori }}",
+        adet: {{ product.adet }}
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+];
+
+// DOM elementleri
+const searchInput = document.getElementById('product_search');
+const productDropdown = document.getElementById('product_dropdown');
+const productList = document.getElementById('product_list');
+const productCount = document.getElementById('product_count');
+const selectedProduct = document.getElementById('selected_product');
+const selectedName = document.getElementById('selected_name');
+const selectedStock = document.getElementById('selected_stock');
+const selectedDetails = document.getElementById('selected_details');
+const clearSelection = document.getElementById('clear_selection');
+const productIdInput = document.getElementById('product_id');
+
+let selectedProductData = null;
+let searchTimeout = null;
+
+// Arama fonksiyonu
+function searchProducts(query) {
+    if (!query || query.length < 2) {
+        productDropdown.style.display = 'none';
+        return;
+    }
+    
+    const filteredProducts = products.filter(product => {
+        const searchText = `${product.marka} ${product.model} ${product.seri_no} ${product.barkod}`.toLowerCase();
+        return searchText.includes(query.toLowerCase());
+    });
+    
+    displayProducts(filteredProducts);
+}
+
+// Ürünleri göster
+function displayProducts(products) {
+    productList.innerHTML = '';
+    
+    if (products.length === 0) {
+        productList.innerHTML = '<div class="product-item"><div class="product-info"><div class="product-name">Ürün bulunamadı</div></div></div>';
+    } else {
+        products.forEach(product => {
+            const productItem = document.createElement('div');
+            productItem.className = 'product-item';
+            productItem.innerHTML = `
+                <div class="product-info">
+                    <div class="product-name">${product.marka} | ${product.model}</div>
+                    <div class="product-details">
+                        <span>Seri: ${product.seri_no}</span>
+                        <span>Barkod: ${product.barkod}</span>
+                    </div>
+                </div>
+                <div class="product-stock">Stok: ${product.adet}</div>
+            `;
+            
+            productItem.addEventListener('click', () => selectProduct(product));
+            productList.appendChild(productItem);
+        });
+    }
+    
+    productCount.textContent = `${products.length} ürün bulundu`;
+    productDropdown.style.display = 'block';
+}
+
+// Ürün seç
+function selectProduct(product) {
+    selectedProductData = product;
+    
+    // Hidden input'a product ID'yi set et
+    productIdInput.value = product.id;
+    
+    // Seçilen ürün bilgilerini göster
+    selectedName.textContent = `${product.marka} | ${product.model}`;
+    selectedStock.textContent = `Stok: ${product.adet}`;
+    selectedDetails.textContent = `Seri: ${product.seri_no} | Barkod: ${product.barkod}`;
+    
+    // UI'yi güncelle
+    searchInput.value = '';
+    productDropdown.style.display = 'none';
+    selectedProduct.style.display = 'flex';
+    
+    // Ürün bilgilerini göster
+    updateProductInfo(product);
+}
+
+// Ürün bilgilerini güncelle
+function updateProductInfo(product) {
+    const productInfo = document.getElementById('productInfo');
+    if (productInfo) {
+        document.getElementById('infoMarka').textContent = product.marka;
+        document.getElementById('infoModel').textContent = product.model;
+        document.getElementById('infoBarkod').textContent = product.barkod;
+        document.getElementById('infoSeriNo').textContent = product.seri_no;
+        document.getElementById('infoKategori').textContent = product.kategori;
+        document.getElementById('infoAdet').textContent = product.adet;
+        
+        // Maksimum adet ayarla
+        const maxAdet = parseInt(product.adet);
+        document.getElementById('adet').max = maxAdet;
+        document.getElementById('maxAdet').textContent = maxAdet;
+        
+        // Adet input'unu sıfırla
+        document.getElementById('adet').value = '';
+        
+        productInfo.style.display = 'block';
+    }
+}
+
+// Seçimi temizle
+function clearProductSelection() {
+    selectedProductData = null;
+    productIdInput.value = '';
+    selectedProduct.style.display = 'none';
+    
+    const productInfo = document.getElementById('productInfo');
+    if (productInfo) {
+        productInfo.style.display = 'none';
+    }
+}
+
+// Event listeners
+searchInput.addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        searchProducts(this.value);
+    }, 300);
+});
+
+searchInput.addEventListener('focus', function() {
+    if (this.value.length >= 2) {
+        searchProducts(this.value);
+    }
+});
+
+// Dropdown'u kapat
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.product-search-container')) {
+        productDropdown.style.display = 'none';
+    }
+});
+
+clearSelection.addEventListener('click', clearProductSelection);
+
+// Adet validasyonu
+document.getElementById('adet').addEventListener('input', function() {
+    if (!selectedProductData) return;
+    
+    const maxAdet = selectedProductData.adet;
+    const currentAdet = parseInt(this.value);
+    
+    if (currentAdet > maxAdet) {
+        this.setCustomValidity(`Maksimum ${maxAdet} adet çıkış yapabilirsiniz.`);
+        this.classList.add('is-invalid');
+    } else if (currentAdet < 1) {
+        this.setCustomValidity('En az 1 adet çıkış yapmalısınız.');
+        this.classList.add('is-invalid');
+    } else {
+        this.setCustomValidity('');
+        this.classList.remove('is-invalid');
+    }
+});
+
+// Form gönderim validasyonu
+document.querySelector('form').addEventListener('submit', function(e) {
+    const productId = productIdInput.value;
+    const adet = parseInt(document.getElementById('adet').value);
+    
+    if (!productId) {
+        e.preventDefault();
+        alert('Lütfen bir ürün seçin!');
+        return;
+    }
+    
+    if (!adet || adet < 1) {
+        e.preventDefault();
+        alert('Lütfen geçerli bir adet girin!');
+        return;
+    }
+    
+    if (selectedProductData && adet > selectedProductData.adet) {
+        e.preventDefault();
+        alert(`Maksimum ${selectedProductData.adet} adet çıkış yapabilirsiniz!`);
+        return;
+    }
+    
+    // Onay mesajı
+    const productName = selectedProductData ? `${selectedProductData.marka} | ${selectedProductData.model}` : 'Seçilen ürün';
+    if (!confirm(`${productName} ürününden ${adet} adet çıkış yapmak istediğinizden emin misiniz?`)) {
+        e.preventDefault();
+    }
+});
+
+// Klavye kısayolları
+searchInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        productDropdown.style.display = 'none';
+        this.blur();
+    }
+});
+</script>
+{% endblock %}

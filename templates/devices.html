@@ -1,0 +1,522 @@
+{% extends "base.html" %}
+
+{% block title %}Cihazlar - Stok Takip{% endblock %}
+
+{% block content %}
+<!-- Modern Header -->
+<div class="devices-header">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="devices-title">Cihaz Yönetimi</h1>
+            <p class="devices-subtitle">Kayıtlı cihazları görüntüleyin ve yönetin</p>
+        </div>
+        <div class="devices-actions">
+            <a href="{{ url_for('add_device') }}" class="btn-modern btn-success">
+                <i class="fas fa-plus me-2"></i>Yeni Cihaz Ekle
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Arama ve Filtreleme -->
+<div class="modern-card mb-4">
+    <div class="card-body-modern">
+        <form method="GET" class="search-form">
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <div class="input-group-modern">
+                        <span class="input-group-text">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" class="form-control-modern" name="search" 
+                               placeholder="Marka, model veya barkod ile ara..." 
+                               value="{{ request.args.get('search', '') }}">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn-modern btn-primary w-100">
+                        <i class="fas fa-search me-2"></i>Ara
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Cihazlar Listesi -->
+<div class="modern-card">
+    <div class="card-header-modern">
+        <div class="header-content">
+            <h5 class="card-title-modern">
+                <i class="fas fa-laptop me-3"></i>Kayıtlı Cihazlar
+            </h5>
+            <p class="card-subtitle-modern">{{ devices|length }} cihaz bulundu</p>
+        </div>
+    </div>
+    <div class="card-body-modern">
+        {% if devices %}
+        <div class="devices-grid">
+            {% for device in devices %}
+            <div class="device-card">
+                <div class="device-header">
+                    <div class="device-icon">
+                        <i class="fas fa-laptop"></i>
+                    </div>
+                    <div class="device-info">
+                        <h6 class="device-title">{{ device.marka }} {{ device.model }}</h6>
+                        <p class="device-subtitle">{{ device.barkod }}</p>
+                    </div>
+                </div>
+                <div class="device-details">
+                    <div class="detail-item">
+                        <i class="fas fa-tag"></i>
+                        <span>{{ device.marka }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-cube"></i>
+                        <span>{{ device.model }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-barcode"></i>
+                        <span>{{ device.barkod }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-calendar"></i>
+                        <span>{{ device.created_at.strftime('%d.%m.%Y') }}</span>
+                    </div>
+                </div>
+                <div class="device-actions">
+                    <button class="btn-action btn-copy" onclick="copyToClipboard('{{ device.barkod }}')" title="Barkod Kopyala">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                    <button class="btn-action btn-use" onclick="useDevice('{{ device.marka }}', '{{ device.model }}', '{{ device.barkod }}')" title="Ürün Eklemede Kullan">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button class="btn-action btn-delete" onclick="confirmDelete({{ device.id }}, '{{ device.marka }} {{ device.model }}')" title="Cihazı Sil">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-laptop"></i>
+            </div>
+            <h5>Henüz cihaz kaydı yok</h5>
+            <p>Sisteme ilk cihazınızı ekleyerek başlayın.</p>
+            <a href="{{ url_for('add_device') }}" class="btn-modern btn-success">
+                <i class="fas fa-plus me-2"></i>İlk Cihazı Ekle
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Modern Devices Page Styles */
+.devices-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.devices-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.devices-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0.5rem 0 0 0;
+    font-weight: 400;
+}
+
+.devices-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-modern {
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-modern.btn-success {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.btn-modern.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-modern.btn-primary {
+    background: linear-gradient(135deg, #4f46e5, #3730a3);
+    color: white;
+}
+
+.btn-modern.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+/* Modern Cards */
+.modern-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.modern-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+}
+
+.card-header-modern {
+    padding: 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    background: #fafbfc;
+}
+
+.card-title-modern {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.card-subtitle-modern {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 0.5rem 0 0 0;
+}
+
+.card-body-modern {
+    padding: 1.5rem;
+}
+
+/* Search Form */
+.search-form {
+    margin: 0;
+}
+
+.input-group-modern {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-group-text {
+    background: #f8fafc;
+    border: 2px solid #e5e7eb;
+    border-right: none;
+    border-radius: 12px 0 0 12px;
+    padding: 0.75rem 1rem;
+    color: #6b7280;
+}
+
+.form-control-modern {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-left: none;
+    border-radius: 0 12px 12px 0;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form-control-modern:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Devices Grid */
+.devices-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+.device-card {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.device-card:hover {
+    border-color: #4f46e5;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(79, 70, 229, 0.1);
+}
+
+.device-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.device-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #4f46e5, #3730a3);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+}
+
+.device-info {
+    flex: 1;
+}
+
+.device-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+}
+
+.device-subtitle {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 0.25rem 0 0 0;
+}
+
+.device-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+.detail-item i {
+    width: 16px;
+    color: #4f46e5;
+}
+
+.device-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.btn-action {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.875rem;
+}
+
+.btn-copy {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+.btn-copy:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+.btn-use {
+    background: #10b981;
+    color: white;
+}
+
+.btn-use:hover {
+    background: #059669;
+    transform: scale(1.05);
+}
+
+.btn-delete {
+    background: #ef4444;
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #dc2626;
+    transform: scale(1.05);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+}
+
+.empty-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: #64748b;
+    font-size: 2rem;
+}
+
+.empty-state h5 {
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: #64748b;
+    margin-bottom: 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .devices-header {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .devices-title {
+        font-size: 2rem;
+    }
+    
+    .devices-actions {
+        flex-direction: column;
+        width: 100%;
+        margin-top: 1rem;
+    }
+    
+    .devices-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .device-card {
+        padding: 1rem;
+    }
+    
+    .search-form .row {
+        flex-direction: column;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Barkod kopyalama fonksiyonu
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        // Başarı mesajı göster
+        showNotification('Barkod kopyalandı: ' + text, 'success');
+    }).catch(function(err) {
+        console.error('Kopyalama hatası: ', err);
+        showNotification('Kopyalama başarısız!', 'error');
+    });
+}
+
+// Cihazı ürün eklemede kullanma fonksiyonu
+function useDevice(marka, model, barkod) {
+    // Ürün ekleme sayfasına yönlendir
+    const url = new URL('{{ url_for("add_product") }}', window.location.origin);
+    url.searchParams.set('marka', marka);
+    url.searchParams.set('model', model);
+    url.searchParams.set('barkod', barkod);
+    
+    window.location.href = url.toString();
+}
+
+// Bildirim gösterme fonksiyonu
+function showNotification(message, type) {
+    // Önceki bildirimleri kaldır
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(notification => notification.remove());
+    
+    // Yeni bildirim oluştur
+    const notification = document.createElement('div');
+    notification.className = `notification alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
+    notification.style.position = 'fixed';
+    notification.style.top = '20px';
+    notification.style.right = '20px';
+    notification.style.zIndex = '9999';
+    notification.style.minWidth = '300px';
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // 3 saniye sonra otomatik kaldır
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 3000);
+}
+
+// Cihaz silme onay fonksiyonu
+function confirmDelete(deviceId, deviceName) {
+    if (confirm(`"${deviceName}" cihazını silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz!`)) {
+        window.location.href = '{{ url_for("delete_device", device_id=0) }}'.replace('0', deviceId);
+    }
+}
+
+// Sayfa yüklendiğinde URL parametrelerini kontrol et
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const search = urlParams.get('search');
+    
+    if (search) {
+        // Arama sonucu varsa bildirim göster
+        showNotification(`${search} için arama sonuçları gösteriliyor`, 'info');
+    }
+});
+</script>
+{% endblock %}

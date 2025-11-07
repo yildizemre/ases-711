@@ -1,0 +1,277 @@
+2025-09-11 15:03:44,661 - ÇIKIÞ HAREKETÝ EKLENDÝ - Ürün: PHONAK V50 (ID: 1)
+2025-09-11 15:03:44,661 -   Hareket: ÇIKIÞ, 1 adet, Açýklama: database temizleme
+
+2025-09-11 15:03:44,915 -   Kullanýcý: admin (ID: 1)
+2025-09-11 15:07:47,512 - GÝRÝÞ HAREKETÝ EKLENDÝ - Ürün: phonak c123 (ID: 3)
+2025-09-11 15:07:47,512 -   Hareket: GÝRÝÞ, 1 adet, Açýklama: Ýlk stok giriþi - 1 adet
+2025-09-11 15:07:47,523 -   Kullanýcý: admin (ID: 1)
+2025-09-11 15:14:04,329 - ÇIKIÞ HAREKETÝ EKLENDÝ - Ürün: phonak c123 (ID: 3)
+2025-09-11 15:14:04,329 -   Hareket: ÇIKIÞ, 1 adet, Açýklama: emre hastaya verdim
+2025-09-11 15:14:04,335 -   Kullanýcý: admin (ID: 1)
+2025-09-11 15:28:28,781 - GÝRÝÞ HAREKETÝ EKLENDÝ - Ürün: PHONAK V50 (ID: 1)
+2025-09-11 15:28:28,782 -   Hareket: GÝRÝÞ, 1 adet, Açýklama: Ýlk stok giriþi - 1 adet
+2025-09-11 15:28:28,786 -   Kullanýcý: admin (ID: 1)
+2025-09-16 16:08:37,906 - GÝRÝÞ HAREKETÝ EKLENDÝ - Ürün: PHONAK V50 (ID: 2)
+2025-09-16 16:08:37,906 -   Hareket: GÝRÝÞ, 1 adet, Açýklama: Ýlk stok giriþi - 1 adet
+2025-09-16 16:08:38,102 -   Kullanýcý: admin (ID: 1)
+2025-09-16 16:09:03,409 - ÇIKIÞ HAREKETÝ EKLENDÝ - Ürün: PHONAK V50 (ID: 2)
+2025-09-16 16:09:03,409 -   Hareket: ÇIKIÞ, 1 adet, Açýklama: sadsaads
+2025-09-16 16:09:03,414 -   Kullanýcý: admin (ID: 1)
+2025-09-16 16:09:26,649 - ÇIKIÞ HAREKETÝ EKLENDÝ - Ürün: PHONAK V50 (ID: 1)
+2025-09-16 16:09:26,649 -   Hareket: ÇIKIÞ, 1 adet, Açýklama: denem2
+2025-09-16 16:09:26,654 -   Kullanýcý: admin (ID: 1)
+2025-10-04 20:04:10,542 - ÇOKLU GÝRÝÞ HAREKETÝ EKLENDÝ - Ürün: Phonak SKY m30 sp | 10 adet
+2025-10-04 20:04:10,542 -   Seri Numaralarý: serino1, serino2, serino3, serino4, serino5, serino6, serino7, serino8, serino9, serino10
+2025-10-04 20:04:10,542 -   Kullanýcý: admin (ID: 1)
+2025-10-04 20:06:08,588 - ÇOKLU GÝRÝÞ HAREKETÝ EKLENDÝ - Ürün: phonak sky m30 m | 5 adet
+2025-10-04 20:06:08,588 -   Seri Numaralarý: serono5yeni, serono5yeni1, serono5yeni2, serono5yeni4, serono5yeni6
+2025-10-04 20:06:08,588 -   Kullanýcý: admin (ID: 1)
+2025-10-04 20:08:47,578 - ÇIKIÞ HAREKETÝ EKLENDÝ - Ürün: Phonak SKY m30 sp (ID: 1)
+2025-10-04 20:08:47,578 -   Hareket: ÇIKIÞ, 1 adet, Açýklama: emreye çýkýþ yaptým inþ geri getirmesz
+2025-10-04 20:08:47,848 -   Kullanýcý: admin (ID: 1)
+2025-10-04 20:09:46,180 - HAREKET DÜZENLENDÝ - ID: 16, Ürün: Phonak SKY m30 sp (ID: 1)
+2025-10-04 20:09:46,186 -   Eski: cikis, 1 adet, 04.10.2025 17:08, Açýklama: emreye çýkýþ yaptým inþ geri getirmesz
+2025-10-04 20:09:46,186 -   Yeni: giris, 1 adet, 04.10.2025 17:08, Açýklama: emreye çýkýþ yaptým inþ geri getirmesz
+2025-10-04 20:09:46,187 -   Kullanýcý: admin (ID: 1)
+2025-10-04 20:22:13,593 - ÇOKLU GÝRÝÞ HAREKETÝ EKLENDÝ - Ürün: PHONAK NAÝDA M30 SP | 1 adet
+2025-10-04 20:22:13,593 -   Seri Numaralarý: 5418629190
+2025-10-04 20:22:13,593 -   Kullanýcý: admin (ID: 1)
+2025-10-04 20:22:48,411 - ÇIKIÞ HAREKETÝ EKLENDÝ - Ürün: PHONAK NAÝDA M30 SP (ID: 16)
+2025-10-04 20:22:48,411 -   Hareket: ÇIKIÞ, 1 adet, Açýklama: emre satýþ
+2025-10-04 20:22:48,422 -   Kullanýcý: admin (ID: 1)
+2025-10-04 20:26:33,004 - ÇOKLU GÝRÝÞ HAREKETÝ EKLENDÝ - Ürün: PHONAK EMRE | 1 adet
+2025-10-04 20:26:33,004 -   Seri Numaralarý: esma123
+2025-10-04 20:26:33,004 -   Kullanýcý: admin (ID: 1)
+2025-10-04 20:26:49,656 - ÇIKIÞ HAREKETÝ EKLENDÝ - Ürün: PHONAK EMRE (ID: 17)
+2025-10-04 20:26:49,656 -   Hareket: ÇIKIÞ, 1 adet, Açýklama: esmaya deneme çýkýþ
+2025-10-04 20:26:49,663 -   Kullanýcý: admin (ID: 1)
+2025-10-04 20:27:14,927 - HAREKET DÜZENLENDÝ - ID: 20, Ürün: PHONAK EMRE (ID: 17)
+2025-10-04 20:27:14,927 -   Eski: cikis, 1 adet, 04.10.2025 20:26, Açýklama: esmaya deneme çýkýþ
+2025-10-04 20:27:14,927 -   Yeni: giris, 1 adet, 04.10.2025 20:26, Açýklama: esmaya deneme çýkýþ
+2025-10-04 20:27:14,933 -   Kullanýcý: admin (ID: 1)
+2025-10-04 20:49:35,512 - ÇOKLU GÝRÝÞ HAREKETÝ EKLENDÝ - Ürün: PHONAK SKY M30 SP | 5 adet
+2025-10-04 20:49:35,514 -   Seri Numaralarý: SERNO1, SERNO2, SERNO3, SERNO4, SERNO5
+2025-10-04 20:49:35,514 -   Kullanýcý: admin (ID: 1)
+2025-10-04 20:50:04,897 - ÇOKLU GÝRÝÞ HAREKETÝ EKLENDÝ - Ürün: EMRE esma1 | 2 adet
+2025-10-04 20:50:04,897 -   Seri Numaralarý: ESMASON1, ESMASON2
+2025-10-04 20:50:04,897 -   Kullanýcý: admin (ID: 1)
+2025-10-04 20:50:50,991 - ÇIKIÞ HAREKETÝ EKLENDÝ - Ürün: EMRE esma1 (ID: 6)
+2025-10-04 20:50:50,991 -   Hareket: ÇIKIÞ, 1 adet, Açýklama: çýkýþyaptým emre müþtersine
+2025-10-04 20:50:51,005 -   Kullanýcý: admin (ID: 1)
+2025-10-04 20:51:17,936 - HAREKET DÜZENLENDÝ - ID: 8, Ürün: EMRE esma1 (ID: 6)
+2025-10-04 20:51:17,936 -   Eski: cikis, 1 adet, 04.10.2025 20:50, Açýklama: çýkýþyaptým emre müþtersine
+2025-10-04 20:51:17,936 -   Yeni: giris, 1 adet, 04.10.2025 20:50, Açýklama: çýkýþyaptým emre müþtersine
+2025-10-04 20:51:17,942 -   Kullanýcý: admin (ID: 1)
+2025-10-04 21:17:40,753 - ÇIKIÞ HAREKETÝ EKLENDÝ - Ürün: EMRE esma1 (ID: 7)
+2025-10-04 21:17:40,753 -   Hareket: ÇIKIÞ, 1 adet, Açýklama: deneme çýkýþ
+2025-10-04 21:17:40,753 -   Hasta: EMRE YILDIZ, Bildirim: verildi
+2025-10-04 21:17:40,769 -   Kullanýcý: admin (ID: 1)
+2025-10-04 21:19:22,414 - ÇOKLU GÝRÝÞ HAREKETÝ EKLENDÝ - Ürün: PHONAK V50 | 2 adet
+2025-10-04 21:19:22,414 -   Seri Numaralarý: SERINO1, SERINO2
+2025-10-04 21:19:22,414 -   Kullanýcý: admin (ID: 1)
+2025-10-04 21:19:45,560 - ÇIKIÞ HAREKETÝ EKLENDÝ - Ürün: PHONAK V50 (ID: 1)
+2025-10-04 21:19:45,560 -   Hareket: ÇIKIÞ, 1 adet, Açýklama: hasta verdim 
+2025-10-04 21:19:45,560 -   Hasta: EMRE YILDIZ, Bildirim: verildi
+2025-10-04 21:19:45,560 -   Kullanýcý: admin (ID: 1)
+2025-10-04 21:20:26,944 - ÇOKLU GÝRÝÞ HAREKETÝ EKLENDÝ - Ürün: PHONAK V50 | 2 adet
+2025-10-04 21:20:26,944 -   Seri Numaralarý: SERINO1, SERINO2
+2025-10-04 21:20:26,944 -   Kullanýcý: admin (ID: 1)
+2025-10-04 21:21:00,620 - ÇIKIÞ HAREKETÝ EKLENDÝ - Ürün: PHONAK V50 (ID: 1)
+2025-10-04 21:21:00,620 -   Hareket: ÇIKIÞ, 1 adet, Açýklama: paranýn yarýsýný verdi henðz
+2025-10-04 21:21:00,620 -   Hasta: EMRE YILDIZ, Bildirim: verildi
+2025-10-04 21:21:00,627 -   Kullanýcý: admin (ID: 1)
+2025-10-04 21:22:13,059 - ÇOKLU GÝRÝÞ HAREKETÝ EKLENDÝ - Ürün: OTÝCON 123321 | 2 adet
+2025-10-04 21:22:13,059 -   Seri Numaralarý: OTÝCONSERÝNO1, OTÝCONSERÝNO2
+2025-10-04 21:22:13,059 -   Kullanýcý: admin (ID: 1)
+2025-10-04 21:22:31,187 - ÇOKLU GÝRÝÞ HAREKETÝ EKLENDÝ - Ürün: CASELGÝ MODEL1 | 2 adet
+2025-10-04 21:22:31,187 -   Seri Numaralarý: CASELSERÝNO1, CASELSERÝNO2
+2025-10-04 21:22:31,187 -   Kullanýcý: admin (ID: 1)
+2025-10-04 21:24:03,442 - ÇIKIÞ HAREKETÝ EKLENDÝ - Ürün: CASELGÝ MODEL1 (ID: 5)
+2025-10-04 21:24:03,442 -   Hareket: ÇIKIÞ, 1 adet, Açýklama: PARA VERMEDÝ
+2025-10-04 21:24:03,442 -   Hasta: ESMA GÜNDÖNER, Bildirim: verilmedi
+2025-10-04 21:24:03,447 -   Kullanýcý: admin (ID: 1)
+2025-10-16 10:04:01,754 - Ã‡IKIÅž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK TERRA+ RIC-312 (ID: 112)
+2025-10-16 10:04:01,754 -   Hareket: Ã‡IKIÅž, 1 adet, AÃ§Ä±klama: SATIÅž
+2025-10-16 10:04:01,754 -   Hasta: SITKI TURAN, Bildirim: verilmedi
+2025-10-16 10:04:01,754 -   Stok deÄŸiÅŸimi: 1 â†’ 0
+2025-10-16 10:04:01,754 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-16 10:05:55,522 - Ã‡IKIÅž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK TERRA+ RIC-312 (ID: 111)
+2025-10-16 10:05:55,522 -   Hareket: Ã‡IKIÅž, 1 adet, AÃ§Ä±klama: SATIÅž
+2025-10-16 10:05:55,522 -   Hasta: SITKI TURAN, Bildirim: verilmedi
+2025-10-16 10:05:55,522 -   Stok deÄŸiÅŸimi: 1 â†’ 0
+2025-10-16 10:05:55,522 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-16 11:13:37,060 - Ã‡IKIÅž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK TERRA+ BTE-M (ID: 96)
+2025-10-16 11:13:37,060 -   Hareket: Ã‡IKIÅž, 1 adet, AÃ§Ä±klama: SATIÅž
+2025-10-16 11:13:37,060 -   Hasta: YURDANUR METE, Bildirim: verilmedi
+2025-10-16 11:13:37,060 -   Stok deÄŸiÅŸimi: 1 â†’ 0
+2025-10-16 11:13:37,060 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-16 11:14:00,486 - Ã‡IKIÅž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK TERRA+ BTE-M (ID: 98)
+2025-10-16 11:14:00,486 -   Hareket: Ã‡IKIÅž, 1 adet, AÃ§Ä±klama: SATIÅž
+2025-10-16 11:14:00,487 -   Hasta: YURDANUR METE, Bildirim: verilmedi
+2025-10-16 11:14:00,487 -   Stok deÄŸiÅŸimi: 1 â†’ 0
+2025-10-16 11:14:00,487 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-16 11:15:36,402 - Ã‡IKIÅž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK AUDÃ‰O P30-312 (ID: 13)
+2025-10-16 11:15:36,403 -   Hareket: Ã‡IKIÅž, 1 adet, AÃ§Ä±klama: SATIÅž
+2025-10-16 11:15:36,403 -   Hasta: Ä°SMAÄ°L AKOÄžLU, Bildirim: verilmedi
+2025-10-16 11:15:36,403 -   Stok deÄŸiÅŸimi: 1 â†’ 0
+2025-10-16 11:15:36,403 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-16 11:16:29,481 - Ã‡IKIÅž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK AUDÃ‰O P30-312 (ID: 49)
+2025-10-16 11:16:29,481 -   Hareket: Ã‡IKIÅž, 1 adet, AÃ§Ä±klama: SATIÅž
+2025-10-16 11:16:29,482 -   Hasta: Ä°SMAÄ°L AKOÄžLU, Bildirim: verilmedi
+2025-10-16 11:16:29,482 -   Stok deÄŸiÅŸimi: 1 â†’ 0
+2025-10-16 11:16:29,482 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-16 11:17:34,322 - Ã‡IKIÅž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK NAIDA M30-SP (ID: 74)
+2025-10-16 11:17:34,322 -   Hareket: Ã‡IKIÅž, 1 adet, AÃ§Ä±klama: SATIÅž
+2025-10-16 11:17:34,322 -   Hasta: KEZBAN BAÅž, Bildirim: verilmedi
+2025-10-16 11:17:34,323 -   Stok deÄŸiÅŸimi: 1 â†’ 0
+2025-10-16 11:17:34,323 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-16 11:25:08,914 - Ã‡IKIÅž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK TERRA+ BTE-M (ID: 91)
+2025-10-16 11:25:08,915 -   Hareket: Ã‡IKIÅž, 1 adet, AÃ§Ä±klama: SATIÅž
+2025-10-16 11:25:08,915 -   Hasta: EMÄ°NE ÅžAHÄ°N, Bildirim: verilmedi
+2025-10-16 11:25:08,915 -   Stok deÄŸiÅŸimi: 1 â†’ 0
+2025-10-16 11:25:08,915 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-16 11:25:37,009 - Ã‡IKIÅž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK TERRA+ BTE-M (ID: 93)
+2025-10-16 11:25:37,010 -   Hareket: Ã‡IKIÅž, 1 adet, AÃ§Ä±klama: SATIÅž
+2025-10-16 11:25:37,010 -   Hasta: EMÄ°NE ÅžAHÄ°N, Bildirim: verilmedi
+2025-10-16 11:25:37,010 -   Stok deÄŸiÅŸimi: 1 â†’ 0
+2025-10-16 11:25:37,010 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-16 11:27:09,046 - Ã‡IKIÅž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK TERRA+ RIC-312 (ID: 102)
+2025-10-16 11:27:09,046 -   Hareket: Ã‡IKIÅž, 1 adet, AÃ§Ä±klama: SATIÅž
+2025-10-16 11:27:09,046 -   Hasta: GÃœLLÃœ BOZKURT, Bildirim: verilmedi
+2025-10-16 11:27:09,046 -   Stok deÄŸiÅŸimi: 1 â†’ 0
+2025-10-16 11:27:09,046 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-16 11:27:31,096 - Ã‡IKIÅž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK TERRA+ RIC-312 (ID: 107)
+2025-10-16 11:27:31,096 -   Hareket: Ã‡IKIÅž, 1 adet, AÃ§Ä±klama: SATIÅž
+2025-10-16 11:27:31,096 -   Hasta: GÃœLLÃœ BOZKURT, Bildirim: verilmedi
+2025-10-16 11:27:31,096 -   Stok deÄŸiÅŸimi: 1 â†’ 0
+2025-10-16 11:27:31,096 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-16 12:52:52,341 - Ã‡IKIÅž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: OTICON OTICON ZIRCON 2 MINIRITE T (ID: 158)
+2025-10-16 12:52:52,341 -   Hareket: Ã‡IKIÅž, 1 adet, AÃ§Ä±klama: HATALI SERÄ° NO
+2025-10-16 12:52:52,342 -   Hasta: HATALI SERÄ° NO, Bildirim: verilmedi
+2025-10-16 12:52:52,342 -   Stok deÄŸiÅŸimi: 1 â†’ 0
+2025-10-16 12:52:52,342 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-16 12:53:51,568 - Ã‡OKLU GÄ°RÄ°Åž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: OTICON ZIRCON 2 MINIRITE T | 1 adet
+2025-10-16 12:53:51,568 -   Seri NumaralarÄ±: B9T58J
+2025-10-16 12:53:51,568 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-16 13:03:49,098 - Ã‡IKIÅž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: OTICON OTICON REAL 1 MINIRITE R (ID: 150)
+2025-10-16 13:03:49,099 -   Hareket: Ã‡IKIÅž, 1 adet, AÃ§Ä±klama: SATIÅž
+2025-10-16 13:03:49,099 -   Hasta: OSMAN FEVZÄ°OÄžLU, Bildirim: verilmedi
+2025-10-16 13:03:49,099 -   Stok deÄŸiÅŸimi: 1 â†’ 0
+2025-10-16 13:03:49,099 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-16 13:08:42,745 - Ã‡IKIÅž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: OTICON OTICON RUBY 2 BTE PP (ID: 147)
+2025-10-16 13:08:42,745 -   Hareket: Ã‡IKIÅž, 1 adet, AÃ§Ä±klama: HATALI GÄ°RÄ°Åž(STOKTA YOK)
+2025-10-16 13:08:42,746 -   Hasta: HATALI GÄ°RÄ°Åž, Bildirim: verilmedi
+2025-10-16 13:08:42,746 -   Stok deÄŸiÅŸimi: 1 â†’ 0
+2025-10-16 13:08:42,746 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-16 13:10:03,716 - Ã‡IKIÅž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK SKY L30-SP (ID: 2)
+2025-10-16 13:10:03,716 -   Hareket: Ã‡IKIÅž, 1 adet, AÃ§Ä±klama: HATALI SERÄ° NO
+2025-10-16 13:10:03,716 -   Hasta: HATALI SERÄ° NO, Bildirim: verilmedi
+2025-10-16 13:10:03,716 -   Stok deÄŸiÅŸimi: 1 â†’ 0
+2025-10-16 13:10:03,716 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-16 13:10:53,319 - Ã‡OKLU GÄ°RÄ°Åž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK SKY L30-SP | 1 adet
+2025-10-16 13:10:53,320 -   Seri NumaralarÄ±: 2508N2ENW
+2025-10-16 13:10:53,320 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-16 13:16:56,014 - Ã‡IKIÅž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: BERNAFON BERNAFON LX3 BTE UP SABE/MAC LEOX 3 (ID: 195)
+2025-10-16 13:16:56,014 -   Hareket: Ã‡IKIÅž, 1 adet, AÃ§Ä±klama: HATALI SERÄ° NO 
+2025-10-16 13:16:56,014 -   Hasta: HATALI SERÄ° NO, Bildirim: verilmedi
+2025-10-16 13:16:56,014 -   Stok deÄŸiÅŸimi: 1 â†’ 0
+2025-10-16 13:16:56,014 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-16 13:18:52,008 - Ã‡OKLU GÄ°RÄ°Åž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: BERNAFON BERNAFON LX3 BTE UP SABE/MAC LEOX 3 | 1 adet
+2025-10-16 13:18:52,009 -   Seri NumaralarÄ±: 35330050
+2025-10-16 13:18:52,009 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-16 13:25:49,736 - Ã‡IKIÅž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: BERNAFON BERNAFON ALPHA 1 MNR T TR SABE/MSIL (ID: 211)
+2025-10-16 13:25:49,736 -   Hareket: Ã‡IKIÅž, 1 adet, AÃ§Ä±klama: HATALI SERÄ° NO
+2025-10-16 13:25:49,736 -   Hasta: HATALI SERÄ° NO, Bildirim: verildi
+2025-10-16 13:25:49,736 -   Stok deÄŸiÅŸimi: 1 â†’ 0
+2025-10-16 13:25:49,736 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-16 13:26:48,582 - Ã‡OKLU GÄ°RÄ°Åž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: BERNAFON  BERNAFON ALPHA 1 MNR T TR SABE/MSIL | 1 adet
+2025-10-16 13:26:48,582 -   Seri NumaralarÄ±: B5V5ZN
+2025-10-16 13:26:48,583 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-16 13:29:36,133 - Ã‡IKIÅž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: BERNAFON BERNAFON VN5 B 105 SABE/MSIL VIRON 5 (ID: 206)
+2025-10-16 13:29:36,133 -   Hareket: Ã‡IKIÅž, 1 adet, AÃ§Ä±klama: SATIÅž
+2025-10-16 13:29:36,133 -   Hasta: MÃœZEYYEN AYDIN, Bildirim: verildi
+2025-10-16 13:29:36,133 -   Stok deÄŸiÅŸimi: 1 â†’ 0
+2025-10-16 13:29:36,134 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-16 13:30:39,054 - Ã‡IKIÅž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: BERNAFON BERNAFON VN5 B 105 SABE/MSIL VIRON 5 (ID: 207)
+2025-10-16 13:30:39,054 -   Hareket: Ã‡IKIÅž, 1 adet, AÃ§Ä±klama: SATIÅž
+2025-10-16 13:30:39,054 -   Hasta: MÃœZEYYEN AYDIN, Bildirim: verilmedi
+2025-10-16 13:30:39,054 -   Stok deÄŸiÅŸimi: 1 â†’ 0
+2025-10-16 13:30:39,054 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-16 15:08:51,017 - Ã‡IKIÅž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK TERRA+ BTE-SP (ID: 114)
+2025-10-16 15:08:51,017 -   Hareket: Ã‡IKIÅž, 1 adet, AÃ§Ä±klama: Yok
+2025-10-16 15:08:51,017 -   Hasta: NEVREZ CAN, Bildirim: verilmedi
+2025-10-16 15:08:51,018 -   Stok deÄŸiÅŸimi: 1 â†’ 0
+2025-10-16 15:08:51,018 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-16 15:09:05,119 - HAREKET DÃœZENLENDÄ° - ID: 275, ÃœrÃ¼n: PHONAK TERRA+ BTE-SP (ID: 114)
+2025-10-16 15:09:05,119 -   Eski: cikis, 1 adet, 16.10.2025 15:08, AÃ§Ä±klama: Yok
+2025-10-16 15:09:05,119 -   Yeni: cikis, 1 adet, 16.10.2025 15:08, AÃ§Ä±klama: SATIÅž
+2025-10-16 15:09:05,120 -   Stok deÄŸiÅŸimi: 1 â†’ 0
+2025-10-16 15:09:05,120 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-21 12:48:41,050 - Ã‡OKLU GÄ°RÄ°Åž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK SKY L90-SP | 2 adet
+2025-10-21 12:48:41,050 -   Seri NumaralarÄ±: 2533X003X, 2533X003Y
+2025-10-21 12:48:41,050 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-21 13:10:49,580 - Ã‡OKLU GÄ°RÄ°Åž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK VÄ°RTO P30-10 NW O R | 2 adet
+2025-10-21 13:10:49,581 -   Seri NumaralarÄ±: 2523N08L9, 2514N1U2E
+2025-10-21 13:10:49,581 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-21 13:13:29,494 - Ã‡OKLU GÄ°RÄ°Åž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK VÄ°RTO P30-10 NW O L | 1 adet
+2025-10-21 13:13:29,494 -   Seri NumaralarÄ±: 2515N0N72
+2025-10-21 13:13:29,494 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-21 13:15:24,378 - Ã‡OKLU GÄ°RÄ°Åž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK VÄ°RTO P50-10 NW O R | 1 adet
+2025-10-21 13:15:24,379 -   Seri NumaralarÄ±: 2513N1GHG
+2025-10-21 13:15:24,379 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-21 13:16:38,034 - Ã‡OKLU GÄ°RÄ°Åž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK VÄ°RTO P50-10 NW O R | 1 adet
+2025-10-21 13:16:38,034 -   Seri NumaralarÄ±: 2513N1GHH
+2025-10-21 13:16:38,034 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-21 13:19:14,476 - Ã‡OKLU GÄ°RÄ°Åž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK VÄ°RTO P50-10 NW O L | 2 adet
+2025-10-21 13:19:14,476 -   Seri NumaralarÄ±: 2520N2D0D, 2520N2D0C
+2025-10-21 13:19:14,476 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-21 13:20:41,502 - Ã‡OKLU GÄ°RÄ°Åž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK VÄ°RTO P30-10 NW O R | 2 adet
+2025-10-21 13:20:41,502 -   Seri NumaralarÄ±: 2523N08LD, 2515N0N77
+2025-10-21 13:20:41,502 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-21 13:37:18,669 - Ã‡OKLU GÄ°RÄ°Åž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK AUDEO P50-312 | 2 adet
+2025-10-21 13:37:18,669 -   Seri NumaralarÄ±: 2323X0TML, 2321X1GPU
+2025-10-21 13:37:18,669 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-21 13:45:20,076 - Ã‡OKLU GÄ°RÄ°Åž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK TERRA+ RIC-312 | 1 adet
+2025-10-21 13:45:20,076 -   Seri NumaralarÄ±: 2522N2N74
+2025-10-21 13:45:20,076 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-21 13:50:59,315 - Ã‡OKLU GÄ°RÄ°Åž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK TERRA+ BTE M | 2 adet
+2025-10-21 13:50:59,315 -   Seri NumaralarÄ±: 2451N2FUX, 2451N3AUL
+2025-10-21 13:50:59,315 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-21 13:54:35,824 - Ã‡OKLU GÄ°RÄ°Åž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: COSELGI EFFECT E-F2 E3 | 2 adet
+2025-10-21 13:54:35,824 -   Seri NumaralarÄ±: 45496, 41872
+2025-10-21 13:54:35,825 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-27 08:13:27,472 - Ã‡IKIÅž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK TERRA+ BTE-SP (ID: 138)
+2025-10-27 08:13:27,473 -   Hareket: Ã‡IKIÅž, 1 adet, AÃ§Ä±klama: satÄ±ÅŸ
+2025-10-27 08:13:27,473 -   Hasta: SEYRAN ALMA, Bildirim: verilmedi
+2025-10-27 08:13:27,473 -   Stok deÄŸiÅŸimi: 1 â†’ 0
+2025-10-27 08:13:27,474 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-27 08:14:41,246 - Ã‡IKIÅž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK TERRA+ BTE-M (ID: 92)
+2025-10-27 08:14:41,247 -   Hareket: Ã‡IKIÅž, 1 adet, AÃ§Ä±klama: SATIÅž
+2025-10-27 08:14:41,247 -   Hasta: AYÅžE KAVAL, Bildirim: verilmedi
+2025-10-27 08:14:41,248 -   Stok deÄŸiÅŸimi: 1 â†’ 0
+2025-10-27 08:14:41,248 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-27 08:16:24,446 - Ã‡IKIÅž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK TERRA+ RIC-312 (ID: 100)
+2025-10-27 08:16:24,446 -   Hareket: Ã‡IKIÅž, 1 adet, AÃ§Ä±klama: SATIÅž
+2025-10-27 08:16:24,446 -   Hasta: SUAT KARAKAYA , Bildirim: verilmedi
+2025-10-27 08:16:24,446 -   Stok deÄŸiÅŸimi: 1 â†’ 0
+2025-10-27 08:16:24,446 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-27 08:18:39,918 - Ã‡IKIÅž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK SKY L90-SP (ID: 256)
+2025-10-27 08:18:39,919 -   Hareket: Ã‡IKIÅž, 1 adet, AÃ§Ä±klama: SATIÅž
+2025-10-27 08:18:39,919 -   Hasta: FATÄ°H AKCAN, Bildirim: verilmedi
+2025-10-27 08:18:39,919 -   Stok deÄŸiÅŸimi: 1 â†’ 0
+2025-10-27 08:18:39,919 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-27 08:19:39,297 - Ã‡IKIÅž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK SKY L90-SP (ID: 257)
+2025-10-27 08:19:39,297 -   Hareket: Ã‡IKIÅž, 1 adet, AÃ§Ä±klama: SATIÅž
+2025-10-27 08:19:39,297 -   Hasta: FATÄ°H AKCAN, Bildirim: verilmedi
+2025-10-27 08:19:39,297 -   Stok deÄŸiÅŸimi: 1 â†’ 0
+2025-10-27 08:19:39,298 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-27 14:15:00,125 - Ã‡IKIÅž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK AUDÃ‰O P30-312 (ID: 11)
+2025-10-27 14:15:00,125 -   Hareket: Ã‡IKIÅž, 1 adet, AÃ§Ä±klama: satÄ±ÅŸ
+2025-10-27 14:15:00,125 -   Hasta: NIHAT GÃœNDÃœZ, Bildirim: verilmedi
+2025-10-27 14:15:00,125 -   Stok deÄŸiÅŸimi: 1 â†’ 0
+2025-10-27 14:15:00,125 -   KullanÄ±cÄ±: admin (ID: 1)
+2025-10-27 14:16:12,188 - Ã‡IKIÅž HAREKETÄ° EKLENDÄ° - ÃœrÃ¼n: PHONAK AUDÃ‰O P30-312 (ID: 69)
+2025-10-27 14:16:12,188 -   Hareket: Ã‡IKIÅž, 1 adet, AÃ§Ä±klama: satÄ±ÅŸ
+2025-10-27 14:16:12,188 -   Hasta: NIHAT GÃœNDÃœZ, Bildirim: verilmedi
+2025-10-27 14:16:12,188 -   Stok deÄŸiÅŸimi: 1 â†’ 0
+2025-10-27 14:16:12,188 -   KullanÄ±cÄ±: admin (ID: 1)

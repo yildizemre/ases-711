@@ -1,0 +1,1370 @@
+{% extends "base.html" %}
+
+{% block title %}Hareketler - Stok Takip{% endblock %}
+
+{% block content %}
+<!-- Modern Header -->
+<div class="movements-header">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h1 class="movements-title">Hareket Yönetimi</h1>
+            <p class="movements-subtitle">Tüm stok hareketlerini görüntüleyin ve takip edin</p>
+        </div>
+        <div class="movements-actions">
+            <a href="{{ url_for('exit_product') }}" class="btn-modern btn-warning">
+                <i class="fas fa-minus me-2"></i>Çıkış Yap
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Modern Hareket İstatistikleri -->
+<div class="row mb-5">
+    <div class="col-md-3 mb-4">
+        <div class="modern-card stats-card-modern">
+            <div class="card-icon success">
+                <i class="fas fa-arrow-up"></i>
+            </div>
+            <div class="card-content">
+                <h3 class="card-number">{{ movements|selectattr('movement_type', 'equalto', 'giris')|list|length }}</h3>
+                <p class="card-label">Giriş Hareketi</p>
+                <div class="card-trend positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+{{ movements|selectattr('movement_type', 'equalto', 'giris')|list|length }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="modern-card stats-card-modern">
+            <div class="card-icon danger">
+                <i class="fas fa-arrow-down"></i>
+            </div>
+            <div class="card-content">
+                <h3 class="card-number">{{ movements|selectattr('movement_type', 'equalto', 'cikis')|list|length }}</h3>
+                <p class="card-label">Çıkış Hareketi</p>
+                <div class="card-trend negative">
+                    <i class="fas fa-arrow-down"></i>
+                    <span>-{{ movements|selectattr('movement_type', 'equalto', 'cikis')|list|length }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="modern-card stats-card-modern">
+            <div class="card-icon success">
+                <i class="fas fa-plus"></i>
+            </div>
+            <div class="card-content">
+                <h3 class="card-number">{{ movements|selectattr('movement_type', 'equalto', 'giris')|sum(attribute='adet') }}</h3>
+                <p class="card-label">Toplam Giriş Adedi</p>
+                <div class="card-trend positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+{{ movements|selectattr('movement_type', 'equalto', 'giris')|sum(attribute='adet') }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="modern-card stats-card-modern">
+            <div class="card-icon danger">
+                <i class="fas fa-minus"></i>
+            </div>
+            <div class="card-content">
+                <h3 class="card-number">{{ movements|selectattr('movement_type', 'equalto', 'cikis')|sum(attribute='adet') }}</h3>
+                <p class="card-label">Toplam Çıkış Adedi</p>
+                <div class="card-trend negative">
+                    <i class="fas fa-arrow-down"></i>
+                    <span>-{{ movements|selectattr('movement_type', 'equalto', 'cikis')|sum(attribute='adet') }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modern Hareketler Tablosu -->
+<div class="modern-card">
+    <div class="card-header-modern">
+        <div class="header-content">
+            <h5 class="card-title-modern">
+                <i class="fas fa-history me-3"></i>Tüm Hareketler
+            </h5>
+            <p class="card-subtitle-modern">
+                {% if request.args.get('search') %}
+                    "{{ request.args.get('search') }}" için {{ movements|length }} hareket bulundu
+                {% elif date_filter == 'all' %}
+                    {{ movements|length }} hareket kaydı bulundu (Toplam: {{ total_movements }})
+                {% elif date_filter == 'today' %}
+                    {{ movements|length }} hareket kaydı bulundu (Bugün: {{ today_movements }})
+                {% elif date_filter == 'week' %}
+                    {{ movements|length }} hareket kaydı bulundu (Son 7 gün: {{ week_movements }})
+                {% elif date_filter == 'month' %}
+                    {{ movements|length }} hareket kaydı bulundu (Son 30 gün: {{ month_movements }})
+                {% elif date_filter == 'year' %}
+                    {{ movements|length }} hareket kaydı bulundu (Son 1 yıl)
+                {% elif date_filter == 'custom' %}
+                    {{ movements|length }} hareket kaydı bulundu ({{ custom_date }})
+                {% endif %}
+            </p>
+        </div>
+        <div class="header-actions">
+            <!-- Arama ve Filtreleme -->
+            <div class="search-filter-group">
+                <form method="GET" class="search-filter-form">
+                    <div class="filter-row">
+                        <!-- Arama Alanı -->
+                        <div class="filter-item search-item">
+                            <label for="search" class="filter-label">
+                                <i class="fas fa-search me-2"></i>Arama:
+                            </label>
+                            <input type="text" name="search" id="search" class="form-control-modern" 
+                                   value="{{ request.args.get('search', '') }}" 
+                                   placeholder="Marka, model, barkod, seri no ile ara...">
+                        </div>
+                        
+                        <!-- Tarih Filtresi -->
+                        <div class="filter-item">
+                            <label for="date_filter" class="filter-label">
+                                <i class="fas fa-calendar-alt me-2"></i>Tarih:
+                            </label>
+                            <select name="date_filter" id="date_filter" class="form-select-modern" onchange="updateDateFilter()">
+                                <option value="all" {% if date_filter == 'all' %}selected{% endif %}>Tümü</option>
+                                <option value="today" {% if date_filter == 'today' %}selected{% endif %}>Bugün</option>
+                                <option value="week" {% if date_filter == 'week' %}selected{% endif %}>Son 7 Gün</option>
+                                <option value="month" {% if date_filter == 'month' %}selected{% endif %}>Son 30 Gün</option>
+                                <option value="year" {% if date_filter == 'year' %}selected{% endif %}>Son 1 Yıl</option>
+                                <option value="custom" {% if date_filter == 'custom' %}selected{% endif %}>Özel Tarih</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Özel Tarih -->
+                        <div class="filter-item" id="customDateContainer" style="display: {% if date_filter == 'custom' %}block{% else %}none{% endif %};">
+                            <label for="custom_date" class="filter-label">
+                                <i class="fas fa-calendar me-2"></i>Özel Tarih:
+                            </label>
+                            <input type="date" name="custom_date" id="custom_date" class="form-control-modern" 
+                                   value="{{ custom_date }}" placeholder="Tarih seçin">
+                        </div>
+                        
+                        <!-- Butonlar -->
+                        <div class="filter-item button-group">
+                            <button type="submit" class="btn-modern btn-primary">
+                                <i class="fas fa-search me-2"></i>Ara
+                            </button>
+                            <a href="{{ url_for('movements') }}" class="btn-modern btn-outline">
+                                <i class="fas fa-times me-2"></i>Temizle
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="view-toggle">
+                <button class="btn-icon" data-view="timeline" title="Zaman Çizelgesi">
+                    <i class="fas fa-stream"></i>
+                </button>
+                <button class="btn-icon active" data-view="table" title="Tablo Görünüm">
+                    <i class="fas fa-table"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body-modern">
+        {% if movements %}
+        <!-- Timeline View -->
+        <div class="movements-timeline" id="timelineView" style="display: none;">
+            {% for movement in movements %}
+            <div class="timeline-item">
+                <div class="timeline-marker">
+                    {% if movement.movement_type == 'giris' %}
+                        <i class="fas fa-arrow-up text-success"></i>
+                    {% else %}
+                        <i class="fas fa-arrow-down text-danger"></i>
+                    {% endif %}
+                </div>
+                <div class="timeline-content">
+                    <div class="movement-header">
+                    <div class="movement-product">
+                        <h6>{{ movement.product.marka }} {{ movement.product.model }}</h6>
+                        <div class="product-codes">
+                            <code class="product-code">Barkod: {{ movement.product.barkod }}</code>
+                            <code class="product-code">Seri: {{ movement.product.seri_no }}</code>
+                        </div>
+                    </div>
+                        <div class="movement-meta">
+                            <span class="movement-time">{{ movement.tarih.strftime('%d.%m.%Y %H:%M:%S') }}</span>
+                            <span class="movement-type {% if movement.movement_type == 'giris' %}success{% else %}danger{% endif %}">
+                                {% if movement.movement_type == 'giris' %}
+                                    <i class="fas fa-arrow-up me-1"></i>Giriş
+                                {% else %}
+                                    <i class="fas fa-arrow-down me-1"></i>Çıkış
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="movement-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Adet:</span>
+                            <span class="detail-value quantity">{{ movement.adet }}</span>
+                        </div>
+                        {% if movement.movement_type == 'cikis' and movement.hasta_adi %}
+                        <div class="detail-row">
+                            <span class="detail-label">Hasta:</span>
+                            <span class="detail-value text-primary fw-bold">{{ movement.hasta_adi }}</span>
+                        </div>
+                        {% endif %}
+                        {% if movement.movement_type == 'cikis' and movement.verme_bildirimi %}
+                        <div class="detail-row">
+                            <span class="detail-label">Bildirim:</span>
+                            <span class="detail-value">
+                                {% if movement.verme_bildirimi == 'verildi' %}
+                                    <span class="badge-modern success">
+                                        <i class="fas fa-check me-1"></i>Verildi
+                                    </span>
+                                {% else %}
+                                    <span class="badge-modern warning">
+                                        <i class="fas fa-times me-1"></i>Verilmedi
+                                    </span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        {% endif %}
+                        {% if movement.aciklama %}
+                        <div class="detail-row">
+                            <span class="detail-label">Açıklama:</span>
+                            <span class="detail-value">{{ movement.aciklama }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="detail-row">
+                            <span class="detail-label">Kullanıcı:</span>
+                            <div class="user-info">
+                                <i class="fas fa-user-circle me-2"></i>
+                                <span>{{ movement.user.username }}</span>
+                                {% if movement.user.is_admin %}
+                                    <span class="badge-modern warning">Admin</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="movement-actions">
+                        <button type="button" class="btn-action" 
+                                data-bs-toggle="modal" data-bs-target="#movementModal{{ movement.id }}"
+                                title="Detayları Gör">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <a href="{{ url_for('edit_movement', movement_id=movement.id) }}" 
+                           class="btn-action" title="Düzenle">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{{ url_for('delete_movement', movement_id=movement.id) }}" 
+                           class="btn-action danger" title="Sil"
+                           onclick="return confirm('Bu hareketi silmek istediğinizden emin misiniz?')">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Table View -->
+        <div class="table-view" id="tableView">
+            <div class="table-responsive">
+                <table class="table-modern">
+                    <thead>
+                        <tr>
+                            <th>Tarih</th>
+                            <th>Ürün Bilgileri</th>
+                            <th>Tür</th>
+                            <th>Adet</th>
+                            <th>Hasta Bilgileri</th>
+                            <th>Açıklama</th>
+                            <th>Kullanıcı</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for movement in movements %}
+                        <tr>
+                            <td>
+                                <div class="datetime-info">
+                                    <span class="date">{{ movement.tarih.strftime('%d.%m.%Y') }}</span>
+                                    <span class="time">{{ movement.tarih.strftime('%H:%M:%S') }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="product-info">
+                                    <span class="product-name">{{ movement.product.marka }} {{ movement.product.model }}</span>
+                                    <div class="product-codes">
+                                        <code class="product-code">Barkod: {{ movement.product.barkod }}</code>
+                                        <code class="product-code">Seri: {{ movement.product.seri_no }}</code>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge-modern {% if movement.movement_type == 'giris' %}success{% else %}danger{% endif %}">
+                                    {% if movement.movement_type == 'giris' %}
+                                        <i class="fas fa-arrow-up me-1"></i>Giriş
+                                    {% else %}
+                                        <i class="fas fa-arrow-down me-1"></i>Çıkış
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="quantity-badge">{{ movement.adet }}</span>
+                            </td>
+                            <td>
+                                {% if movement.movement_type == 'cikis' %}
+                                    <div class="patient-info">
+                                        {% if movement.hasta_adi %}
+                                            <div class="patient-name">
+                                                <i class="fas fa-user me-1"></i>
+                                                <span class="text-primary fw-bold">{{ movement.hasta_adi }}</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if movement.verme_bildirimi %}
+                                            <div class="notification-status mt-1">
+                                                {% if movement.verme_bildirimi == 'verildi' %}
+                                                    <span class="badge-modern success small">
+                                                        <i class="fas fa-check me-1"></i>Verildi
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge-modern warning small">
+                                                        <i class="fas fa-times me-1"></i>Verilmedi
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
+                                        {% if not movement.hasta_adi and not movement.verme_bildirimi %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if movement.aciklama %}
+                                    <span class="description" title="{{ movement.aciklama }}">
+                                        {{ movement.aciklama[:50] }}{% if movement.aciklama|length > 50 %}...{% endif %}
+                                    </span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="user-info">
+                                    <i class="fas fa-user-circle me-2"></i>
+                                    <span>{{ movement.user.username }}</span>
+                                    {% if movement.user.is_admin %}
+                                        <span class="badge-modern warning">Admin</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button type="button" class="btn-action" 
+                                            data-bs-toggle="modal" data-bs-target="#movementModal{{ movement.id }}"
+                                            title="Detayları Gör">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <a href="{{ url_for('edit_movement', movement_id=movement.id) }}" 
+                                       class="btn-action" title="Düzenle">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{{ url_for('delete_movement', movement_id=movement.id) }}" 
+                                       class="btn-action danger" title="Sil"
+                                       onclick="return confirm('Bu hareketi silmek istediğinizden emin misiniz?')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-exchange-alt fa-4x text-muted mb-3"></i>
+            <h5 class="text-muted">Henüz hareket kaydı bulunmuyor</h5>
+            <p class="text-muted">Ürün eklediğinizde veya çıkış yaptığınızda hareketler burada görünecek.</p>
+            <div class="empty-actions">
+                <a href="{{ url_for('add_product') }}" class="btn-modern btn-primary me-2">
+                    <i class="fas fa-plus me-2"></i>Ürün Ekle
+                </a>
+                <a href="{{ url_for('exit_product') }}" class="btn-modern btn-warning">
+                    <i class="fas fa-minus me-2"></i>Çıkış Yap
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Hareket Detay Modalları -->
+{% for movement in movements %}
+<div class="modal fade" id="movementModal{{ movement.id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-info-circle me-2"></i>Hareket Detayı
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Hareket Bilgileri</h6>
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Tarih:</strong></td>
+                                <td>{{ movement.tarih.strftime('%d.%m.%Y %H:%M:%S') }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tür:</strong></td>
+                                <td>
+                                    {% if movement.movement_type == 'giris' %}
+                                        <span class="badge bg-success">Giriş</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Çıkış</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Adet:</strong></td>
+                                <td><span class="badge bg-primary">{{ movement.adet }}</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Kullanıcı:</strong></td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold">{{ movement.user.username }}</span>
+                                        <small class="text-muted">{{ movement.user.email }}</small>
+                                        {% if movement.user.is_admin %}
+                                            <small class="badge bg-warning text-dark">Admin</small>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% if movement.movement_type == 'cikis' %}
+                            <tr>
+                                <td><strong>Hasta:</strong></td>
+                                <td>
+                                    {% if movement.hasta_adi %}
+                                        <span class="text-primary fw-bold">{{ movement.hasta_adi }}</span>
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Bildirim:</strong></td>
+                                <td>
+                                    {% if movement.verme_bildirimi %}
+                                        {% if movement.verme_bildirimi == 'verildi' %}
+                                            <span class="badge bg-success">Verildi</span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark">Verilmedi</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Ürün Bilgileri</h6>
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Marka:</strong></td>
+                                <td>{{ movement.product.marka }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Model:</strong></td>
+                                <td>{{ movement.product.model }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Barkod:</strong></td>
+                                <td><code class="text-primary">{{ movement.product.barkod }}</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Seri No:</strong></td>
+                                <td><code class="text-success">{{ movement.product.seri_no }}</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Stok Durumu:</strong></td>
+                                <td>
+                                    <span class="badge {% if movement.product.adet > 0 %}bg-success{% else %}bg-danger{% endif %}">
+                                        {{ movement.product.adet }} adet
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                {% if movement.aciklama %}
+                <div class="mt-3">
+                    <h6>Açıklama</h6>
+                    <div class="alert alert-light">
+                        {{ movement.aciklama }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Modern Movements Page Styles */
+.movements-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.movements-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.movements-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0.5rem 0 0 0;
+    font-weight: 400;
+}
+
+.movements-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-modern {
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-modern.btn-warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+}
+
+.btn-modern.btn-warning:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-modern.btn-primary {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: white;
+}
+
+.btn-modern.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+/* Modern Cards */
+.modern-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.modern-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+}
+
+.card-header-modern {
+    padding: 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    background: #fafbfc;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-title-modern {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.card-subtitle-modern {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 0.5rem 0 0 0;
+}
+
+.card-body-modern {
+    padding: 1.5rem;
+}
+
+/* Stats Cards */
+.stats-card-modern {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem 1.5rem;
+    height: 100%;
+    min-height: 220px;
+}
+
+.stats-card-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #4f46e5, #7c3aed);
+}
+
+.card-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.stats-card-modern:hover .card-icon {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+
+.card-icon.success {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.card-icon.danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.card-icon i {
+    font-size: 1.75rem;
+    color: white;
+}
+
+.card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    flex: 1;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+}
+
+.card-number {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0;
+    line-height: 1;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+}
+
+.card-label {
+    font-size: 0.95rem;
+    color: #64748b;
+    margin: 0;
+    font-weight: 600;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 1.2rem;
+    line-height: 1.2;
+}
+
+.card-trend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.4rem 0.8rem;
+    border-radius: 16px;
+    margin-top: 0.25rem;
+    flex-shrink: 0;
+    min-height: 2rem;
+}
+
+.card-trend.positive {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+}
+
+.card-trend.negative {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
+/* View Toggle */
+.view-toggle {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: none;
+    background: #f1f5f9;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-icon:hover {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.btn-icon.active {
+    background: #4f46e5;
+    color: white;
+}
+
+/* Timeline View */
+.movements-timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.movements-timeline::before {
+    content: '';
+    position: absolute;
+    left: 1rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, #e2e8f0, #cbd5e1);
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -2rem;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+.timeline-marker i {
+    font-size: 0.875rem;
+}
+
+.timeline-content {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid #e2e8f0;
+    flex: 1;
+    transition: all 0.3s ease;
+}
+
+.timeline-content:hover {
+    background: #f1f5f9;
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.movement-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.movement-product h6 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 0.25rem 0;
+}
+
+.product-code {
+    font-size: 0.7rem;
+    color: #64748b;
+    background: #e2e8f0;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    display: inline-block;
+    margin: 0;
+}
+
+.movement-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+.movement-time {
+    font-size: 0.875rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.movement-type {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.movement-type.success {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.movement-type.danger {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.movement-details {
+    margin-bottom: 1rem;
+}
+
+.detail-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.detail-label {
+    font-size: 0.875rem;
+    color: #64748b;
+    font-weight: 500;
+    min-width: 80px;
+}
+
+.detail-value {
+    font-size: 0.875rem;
+    color: #1e293b;
+}
+
+.detail-value.quantity {
+    font-weight: 600;
+    color: #4f46e5;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.badge-modern {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-modern.warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.movement-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-action {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    background: #e2e8f0;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-action:hover {
+    background: #cbd5e1;
+    color: #475569;
+    transform: scale(1.05);
+}
+
+.btn-action.danger {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.btn-action.danger:hover {
+    background: #fecaca;
+    color: #b91c1c;
+    transform: scale(1.05);
+}
+
+/* Table View */
+.table-modern {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.table-modern th {
+    background: #f8fafc;
+    color: #374151;
+    font-weight: 600;
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.table-modern td {
+    padding: 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.table-modern tr:hover {
+    background: #f8fafc;
+}
+
+.datetime-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.date {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.time {
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+.product-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.product-name {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.product-codes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.quantity-badge {
+    background: #4f46e5;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.description {
+    color: #64748b;
+    font-size: 0.875rem;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #64748b;
+}
+
+.empty-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .movements-header {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .movements-title {
+        font-size: 2rem;
+    }
+    
+    .movements-actions {
+        flex-direction: column;
+        width: 100%;
+        margin-top: 1rem;
+    }
+    
+    .movements-timeline {
+        padding-left: 1.5rem;
+    }
+    
+    .timeline-marker {
+        left: -1.5rem;
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+    
+    .movement-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .movement-meta {
+        align-items: flex-start;
+    }
+    
+    .empty-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .stats-card-modern {
+        padding: 1.5rem 1rem;
+        min-height: 200px;
+    }
+    
+    .card-content {
+        gap: 0.5rem;
+        padding: 0.25rem 0;
+    }
+    
+    .card-number {
+        font-size: 2.2rem;
+        min-height: 2.5rem;
+    }
+    
+    .card-label {
+        font-size: 0.85rem;
+        min-height: 1rem;
+    }
+    
+    .card-trend {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.6rem;
+        min-height: 1.8rem;
+    }
+    
+    .card-icon {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 0.75rem;
+    }
+    
+    .card-icon i {
+        font-size: 1.5rem;
+    }
+}
+
+/* Arama ve Filtreleme Stilleri */
+.search-filter-group {
+    margin-bottom: 1rem;
+}
+
+.search-filter-form {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+.filter-row {
+    display: flex;
+    gap: 1rem;
+    align-items: end;
+    flex-wrap: wrap;
+}
+
+.filter-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 150px;
+}
+
+.search-item {
+    flex: 2;
+    min-width: 250px;
+}
+
+.button-group {
+    display: flex;
+    gap: 0.5rem;
+    align-items: end;
+    min-width: auto;
+}
+
+.filter-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.filter-label i {
+    color: #4f46e5;
+}
+
+.form-select-modern,
+.form-control-modern {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+.form-select-modern:focus,
+.form-control-modern:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.btn-modern {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-modern.btn-primary {
+    background: #4f46e5;
+    color: white;
+}
+
+.btn-modern.btn-primary:hover {
+    background: #4338ca;
+    transform: translateY(-1px);
+}
+
+.btn-modern.btn-outline {
+    background: transparent;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+}
+
+.btn-modern.btn-outline:hover {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+/* Patient Info Styles */
+.patient-info {
+    font-size: 0.9rem;
+}
+
+.patient-name {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.notification-status {
+    display: flex;
+    align-items: center;
+}
+
+.badge-modern.small {
+    font-size: 0.75rem;
+    padding: 2px 6px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .filter-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-item {
+        min-width: auto;
+    }
+    
+    .search-item {
+        min-width: auto;
+    }
+    
+    .button-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .patient-info {
+        font-size: 0.8rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// View Toggle Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const timelineBtn = document.querySelector('[data-view="timeline"]');
+    const tableBtn = document.querySelector('[data-view="table"]');
+    const timelineView = document.getElementById('timelineView');
+    const tableView = document.getElementById('tableView');
+    
+    if (timelineBtn && tableBtn && timelineView && tableView) {
+        timelineBtn.addEventListener('click', function() {
+            timelineView.style.display = 'block';
+            tableView.style.display = 'none';
+            timelineBtn.classList.add('active');
+            tableBtn.classList.remove('active');
+        });
+        
+        tableBtn.addEventListener('click', function() {
+            timelineView.style.display = 'none';
+            tableView.style.display = 'block';
+            tableBtn.classList.add('active');
+            timelineBtn.classList.remove('active');
+        });
+    }
+});
+
+// Tarih filtreleme
+function updateDateFilter() {
+    const dateFilter = document.getElementById('date_filter');
+    const customDateContainer = document.getElementById('customDateContainer');
+    
+    if (dateFilter.value === 'custom') {
+        customDateContainer.style.display = 'block';
+    } else {
+        customDateContainer.style.display = 'none';
+    }
+}
+
+// Sayfa yüklendiğinde tarih filtreleme durumunu kontrol et
+document.addEventListener('DOMContentLoaded', function() {
+    updateDateFilter();
+});
+
+// Hareket türü filtreleme (gelecekte eklenebilir)
+function filterByType(type) {
+    // Bu fonksiyon gelecekte hareket türü filtreleme için kullanılabilir
+    console.log('Hareket türü filtreleme:', type);
+}
+
+// Arama önerileri (gelecekte eklenebilir)
+function setupSearchSuggestions() {
+    const searchInput = document.getElementById('search');
+    if (searchInput) {
+        // Gelecekte AJAX ile arama önerileri eklenebilir
+        searchInput.addEventListener('input', function() {
+            const query = this.value;
+            if (query.length > 2) {
+                console.log('Arama önerileri için:', query);
+                // Burada AJAX ile öneriler alınabilir
+            }
+        });
+    }
+}
+
+// Sayfa yüklendiğinde arama önerilerini kur
+document.addEventListener('DOMContentLoaded', function() {
+    setupSearchSuggestions();
+});
+</script>
+{% endblock %}

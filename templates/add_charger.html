@@ -1,0 +1,694 @@
+{% extends "base.html" %}
+
+{% block title %}Şarj Cihazı Ekle - Stok Takip{% endblock %}
+
+{% block content %}
+<!-- Modern Header -->
+<div class="add-product-header">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h1 class="add-product-title">Yeni Şarj Cihazı Ekle</h1>
+            <p class="add-product-subtitle">Sisteme yeni şarj cihazı bilgilerini girin</p>
+        </div>
+        <div class="add-product-actions">
+            <a href="{{ url_for('chargers') }}" class="btn-modern btn-outline">
+                <i class="fas fa-arrow-left me-2"></i>Geri Dön
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="modern-card">
+            <div class="card-header-modern">
+                <div class="header-content">
+                    <h5 class="card-title-modern">
+                        <i class="fas fa-battery-full me-3"></i>Şarj Cihazı Bilgileri
+                    </h5>
+                    <p class="card-subtitle-modern">Tüm gerekli alanları doldurun</p>
+                </div>
+            </div>
+            <div class="card-body-modern">
+                <form method="POST" class="modern-form">
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label for="marka" class="field-label">
+                                <i class="fas fa-tag me-2"></i>Marka <span class="required">*</span>
+                            </label>
+                            <div class="input-group-modern">
+                                <input type="text" class="form-control-modern" id="marka" name="marka" 
+                                       placeholder="Şarj cihazı markasını girin" required style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()">
+                            </div>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label for="model" class="field-label">
+                                <i class="fas fa-cube me-2"></i>Model <span class="required">*</span>
+                            </label>
+                            <div class="input-group-modern">
+                                <input type="text" class="form-control-modern" id="model" name="model" 
+                                       placeholder="Şarj cihazı modelini girin" required style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()">
+                            </div>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label for="barkod" class="field-label">
+                                <i class="fas fa-barcode me-2"></i>Barkod <span class="required">*</span>
+                            </label>
+                            <div class="input-group-modern">
+                                <input type="text" class="form-control-modern" id="barkod" name="barkod" 
+                                       placeholder="Barkod girin" required style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()">
+                            </div>
+                            <div class="field-help">Her ürün için aynı barkod kullanılabilir</div>
+                        </div>
+                        
+                        <!-- Seri No Alanları - Dinamik olarak oluşturulacak -->
+                        <div id="seri-no-container" class="form-field">
+                            <div class="seri-no-header">
+                                <label class="field-label">
+                                    <i class="fas fa-hashtag me-2"></i>Seri Numaraları <span class="required">*</span>
+                                </label>
+                                <div class="seri-no-actions">
+                                    <span class="seri-no-count" id="seri-no-count"></span>
+                                    <button type="button" class="auto-fill-btn" onclick="autoFillSeriNos()" style="display: none;" id="auto-fill-btn">
+                                        <i class="fas fa-magic me-1"></i>Otomatik Doldur
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="seri-no-grid" id="seri-no-grid">
+                                <!-- Bu alan JavaScript ile dinamik olarak doldurulacak -->
+                            </div>
+                            <div class="field-help">Her şarj cihazı için benzersiz seri numarası girin</div>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label for="adet" class="field-label">
+                                <i class="fas fa-cubes me-2"></i>Başlangıç Adedi <span class="required">*</span>
+                            </label>
+                            <div class="input-group-modern">
+                                <input type="number" class="form-control-modern" id="adet" name="adet" 
+                                       min="1" placeholder="Stok adedi" required onchange="generateSeriNoFields()" oninput="generateSeriNoFields()">
+                            </div>
+                            <div class="field-help">Stok girişi için başlangıç adedi - Bu kadar seri no alanı oluşturulacak</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <a href="{{ url_for('chargers') }}" class="btn-modern btn-outline">
+                            <i class="fas fa-arrow-left me-2"></i>Geri Dön
+                        </a>
+                        <button type="submit" class="btn-modern btn-success">
+                            <i class="fas fa-save me-2"></i>Şarj Cihazını Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Modern Yardım Kartı -->
+        <div class="modern-card mt-4">
+            <div class="card-header-modern">
+                <div class="header-content">
+                    <h5 class="card-title-modern">
+                        <i class="fas fa-info-circle me-3"></i>Şarj Cihazı Ekleme Hakkında
+                    </h5>
+                    <p class="card-subtitle-modern">Şarj cihazı ekleme süreci ve önemli bilgiler</p>
+                </div>
+            </div>
+            <div class="card-body-modern">
+                <div class="help-grid">
+                    <div class="help-section">
+                        <h6 class="help-title">
+                            <i class="fas fa-list-check me-2"></i>Gerekli Bilgiler
+                        </h6>
+                        <div class="help-list">
+                            <div class="help-item success">
+                                <i class="fas fa-check"></i>
+                                <span>Marka ve model bilgisi</span>
+                            </div>
+                            <div class="help-item success">
+                                <i class="fas fa-check"></i>
+                                <span>Barkod numarası</span>
+                            </div>
+                            <div class="help-item success">
+                                <i class="fas fa-check"></i>
+                                <span>Benzersiz seri numarası</span>
+                            </div>
+                            <div class="help-item success">
+                                <i class="fas fa-check"></i>
+                                <span>Başlangıç adedi</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="help-section">
+                        <h6 class="help-title">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Önemli Notlar
+                        </h6>
+                        <div class="help-list">
+                            <div class="help-item warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>Seri numaralar benzersiz olmalı</span>
+                            </div>
+                            <div class="help-item info">
+                                <i class="fas fa-info"></i>
+                                <span>Her cihaz için ayrı seri no girilmelidir</span>
+                            </div>
+                            <div class="help-item primary">
+                                <i class="fas fa-edit"></i>
+                                <span>Maksimum 50 adet tek seferde eklenebilir</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Modern Add Product Page Styles */
+.add-product-header {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.add-product-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.add-product-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0.5rem 0 0 0;
+    font-weight: 400;
+}
+
+.add-product-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-modern {
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-modern.btn-success {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.btn-modern.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-modern.btn-outline {
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255,255,255,0.3);
+}
+
+.btn-modern.btn-outline:hover {
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.5);
+    color: white;
+    text-decoration: none;
+}
+
+/* Modern Cards */
+.modern-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.modern-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+}
+
+.card-header-modern {
+    padding: 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    background: #fafbfc;
+}
+
+.card-title-modern {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.card-subtitle-modern {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 0.5rem 0 0 0;
+}
+
+.card-body-modern {
+    padding: 1.5rem;
+}
+
+/* Modern Form */
+.modern-form {
+    margin: 0;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.field-label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.875rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.required {
+    color: #ef4444;
+    margin-left: 0.25rem;
+}
+
+.input-group-modern {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.form-control-modern {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form-control-modern:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.field-help {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+/* Help Section */
+.help-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.help-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.help-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.help-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.help-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.help-item:hover {
+    background: #f1f5f9;
+    transform: translateX(4px);
+}
+
+.help-item i {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+}
+
+.help-item.success {
+    border-left: 4px solid #10b981;
+}
+
+.help-item.success i {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.help-item.warning {
+    border-left: 4px solid #f59e0b;
+}
+
+.help-item.warning i {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.help-item.info {
+    border-left: 4px solid #06b6d4;
+}
+
+.help-item.info i {
+    background: #cffafe;
+    color: #0891b2;
+}
+
+.help-item.primary {
+    border-left: 4px solid #4f46e5;
+}
+
+.help-item.primary i {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
+.help-item span {
+    font-size: 0.875rem;
+    color: #374151;
+    font-weight: 500;
+}
+
+/* Seri No Grid Styles */
+.seri-no-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.seri-no-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.seri-no-field label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    font-weight: 500;
+    margin: 0;
+}
+
+.seri-no-field input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.seri-no-field input:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.seri-no-field input:invalid {
+    border-color: #ef4444;
+}
+
+.seri-no-field input:valid {
+    border-color: #10b981;
+}
+
+/* Seri No Alanları için özel stiller */
+#seri-no-container {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+    transition: all 0.3s ease;
+}
+
+#seri-no-container.has-content {
+    border-color: #4f46e5;
+    background: #f0f4ff;
+}
+
+.seri-no-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.seri-no-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.seri-no-count {
+    font-size: 0.875rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.auto-fill-btn {
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.auto-fill-btn:hover {
+    background: #059669;
+    transform: translateY(-1px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .add-product-header {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .add-product-title {
+        font-size: 2rem;
+    }
+    
+    .add-product-actions {
+        flex-direction: column;
+        width: 100%;
+        margin-top: 1rem;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .help-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Başlangıç adedi değiştiğinde seri no alanlarını oluştur
+function generateSeriNoFields() {
+    const adet = parseInt(document.getElementById('adet').value) || 0;
+    const seriNoGrid = document.getElementById('seri-no-grid');
+    const seriNoCount = document.getElementById('seri-no-count');
+    const autoFillBtn = document.getElementById('auto-fill-btn');
+    
+    // Mevcut alanları temizle
+    seriNoGrid.innerHTML = '';
+    
+    if (adet > 0 && adet <= 50) {
+        // Seri no alanlarını oluştur
+        for (let i = 1; i <= adet; i++) {
+            const seriNoField = document.createElement('div');
+            seriNoField.className = 'seri-no-field';
+            seriNoField.innerHTML = `
+                <label for="seri_no_${i}">Seri No ${i}</label>
+                <input type="text" 
+                       id="seri_no_${i}" 
+                       name="seri_no_${i}" 
+                       placeholder="Benzersiz seri no girin" 
+                       required style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()">
+            `;
+            seriNoGrid.appendChild(seriNoField);
+        }
+        
+        // Container'ı güncelle
+        const container = document.getElementById('seri-no-container');
+        container.classList.add('has-content');
+        
+        // Sayacı güncelle
+        seriNoCount.textContent = `${adet} seri numarası`;
+        
+        // Otomatik doldur butonunu göster
+        autoFillBtn.style.display = 'inline-flex';
+        
+        // İlk alana odaklan
+        setTimeout(() => {
+            document.getElementById('seri_no_1').focus();
+        }, 100);
+        
+    } else if (adet > 50) {
+        // Çok fazla adet uyarısı
+        seriNoGrid.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #ef4444;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                <p style="margin: 0; font-weight: 600;">Çok fazla adet!</p>
+                <p style="margin: 0.5rem 0 0 0;">Maksimum 50 adet ekleyebilirsiniz.</p>
+            </div>
+        `;
+        seriNoCount.textContent = '';
+        autoFillBtn.style.display = 'none';
+    } else {
+        // Alanları temizle
+        const container = document.getElementById('seri-no-container');
+        container.classList.remove('has-content');
+        seriNoCount.textContent = '';
+        autoFillBtn.style.display = 'none';
+    }
+}
+
+// Otomatik seri no doldurma
+function autoFillSeriNos() {
+    const adet = parseInt(document.getElementById('adet').value) || 0;
+    const barkod = document.getElementById('barkod').value;
+    
+    if (barkod && adet > 0) {
+        for (let i = 1; i <= adet; i++) {
+            const seriNoField = document.getElementById(`seri_no_${i}`);
+            if (seriNoField) {
+                seriNoField.value = `${barkod}-${i.toString().padStart(3, '0')}`;
+            }
+        }
+        alert(`${adet} seri numarası otomatik dolduruldu`);
+    }
+}
+
+// Form validasyonu
+document.querySelector('form').addEventListener('submit', function(e) {
+    const marka = document.getElementById('marka').value;
+    const model = document.getElementById('model').value;
+    const barkod = document.getElementById('barkod').value;
+    const adet = parseInt(document.getElementById('adet').value) || 0;
+    
+    if (!marka || !model || !barkod || adet <= 0) {
+        e.preventDefault();
+        alert('Lütfen tüm gerekli alanları doldurun!');
+        return;
+    }
+    
+    // Seri numaraları kontrolü
+    const seriNos = [];
+    for (let i = 1; i <= adet; i++) {
+        const seriNoField = document.getElementById(`seri_no_${i}`);
+        if (seriNoField && seriNoField.value.trim()) {
+            seriNos.push(seriNoField.value.trim());
+        }
+    }
+    
+    if (seriNos.length !== adet) {
+        e.preventDefault();
+        alert(`Lütfen ${adet} adet seri numarası girin!`);
+        return;
+    }
+    
+    // Benzersizlik kontrolü
+    const uniqueSeriNos = [...new Set(seriNos)];
+    if (uniqueSeriNos.length !== seriNos.length) {
+        e.preventDefault();
+        alert('Seri numaraları benzersiz olmalıdır!');
+        return;
+    }
+});
+</script>
+{% endblock %}
+

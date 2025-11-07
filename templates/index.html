@@ -1,0 +1,688 @@
+{% extends "base.html" %}
+
+{% block title %}Ana Sayfa - Stok Takip{% endblock %}
+
+{% block content %}
+<!-- Modern Header -->
+<div class="dashboard-header">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+                <div>
+            <h1 class="dashboard-title">Dashboard</h1>
+            <p class="dashboard-subtitle">Stok takip sisteminizin genel durumu ve hızlı erişim</p>
+                </div>
+        <div class="dashboard-actions">
+            <button class="btn-modern btn-outline" onclick="location.reload()">
+                <i class="fas fa-sync-alt me-2"></i>Yenile
+            </button>
+            {% if current_user.is_admin %}
+            <button class="btn-modern btn-danger" onclick="cleanData()" style="background: linear-gradient(135deg, #ef4444, #dc2626); border: none;">
+                <i class="fas fa-broom me-2"></i>Verileri Temizle
+            </button>
+            {% endif %}
+        </div>
+        </div>
+    </div>
+    
+<!-- Modern İstatistik Kartları -->
+<div class="row mb-5 justify-content-center">
+    <div class="col-md-5 mb-4">
+        <div class="modern-card stats-card-modern" onclick="window.location.href='{{ url_for('products') }}'" style="cursor: pointer;">
+            <div class="card-icon">
+                <i class="fas fa-boxes"></i>
+            </div>
+            <div class="card-content">
+                <h3 class="card-number">{{ total_products }}</h3>
+                <p class="card-label">Toplam Ürün</p>
+                <div class="card-trend positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+5%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-5 mb-4">
+        <div class="modern-card stats-card-modern" onclick="window.location.href='{{ url_for('movements') }}'" style="cursor: pointer;">
+            <div class="card-icon">
+                <i class="fas fa-exchange-alt"></i>
+            </div>
+            <div class="card-content">
+                <h3 class="card-number">{{ total_movements }}</h3>
+                <p class="card-label">Toplam Hareket</p>
+                <div class="card-trend neutral">
+                    <i class="fas fa-minus"></i>
+                    <span>0%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modern Son Hareketler -->
+<div class="row mb-5">
+    <div class="col-md-12">
+        <div class="modern-card">
+            <div class="card-header-modern">
+                <div class="header-content">
+                    <h5 class="card-title-modern">
+                        <i class="fas fa-history me-3"></i>Son Hareketler
+                    </h5>
+                    <p class="card-subtitle-modern">En son yapılan stok hareketleri ve işlemler</p>
+            </div>
+                <div class="header-actions">
+                    <a href="{{ url_for('movements') }}" class="btn-icon" title="Tüm Hareketleri Gör">
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>
+    </div>
+            </div>
+            <div class="card-body-modern">
+                {% if recent_movements %}
+                    <div class="movements-list">
+                                {% for movement in recent_movements %}
+                        <div class="movement-item">
+                            <div class="movement-icon">
+                                {% if movement.movement_type == 'giris' %}
+                                    <i class="fas fa-arrow-up text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-arrow-down text-danger"></i>
+                                {% endif %}
+                            </div>
+                            <div class="movement-content">
+                                <div class="movement-product">{{ movement.product.marka }} {{ movement.product.model }}</div>
+                                <div class="movement-details">
+                                    <span class="movement-type">
+                                        {% if movement.movement_type == 'giris' %}
+                                            <span class="badge-modern success">Giriş</span>
+                                        {% else %}
+                                            <span class="badge-modern danger">Çıkış</span>
+                                        {% endif %}
+                                    </span>
+                                    <span class="movement-quantity">{{ movement.adet }} adet</span>
+                                    <span class="movement-user">
+                                        <i class="fas fa-user me-1"></i>{{ movement.user.username }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="movement-time">
+                                {{ movement.tarih.strftime('%d.%m.%Y %H:%M:%S') }}
+                            </div>
+                        </div>
+                                {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Henüz hareket kaydı bulunmuyor.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modern Hızlı Erişim -->
+<div class="row">
+    <div class="col-12">
+        <div class="modern-card">
+            <div class="card-header-modern">
+                <div class="header-content">
+                    <h5 class="card-title-modern">
+                        <i class="fas fa-bolt me-3"></i>Hızlı Erişim
+                    </h5>
+                    <p class="card-subtitle-modern">Sık kullanılan işlemlere hızlı erişim</p>
+                </div>
+            </div>
+            <div class="card-body-modern">
+                <div class="quick-actions-grid">
+                    <a href="{{ url_for('add_product') }}" class="quick-action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <div class="action-content">
+                            <h6>Ürün Ekle</h6>
+                            <p>Yeni ürün ekle</p>
+        </div>
+                    </a>
+                    
+                    <a href="{{ url_for('exit_product') }}" class="quick-action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-minus"></i>
+    </div>
+                        <div class="action-content">
+                            <h6>Çıkış Yap</h6>
+                            <p>Stok çıkışı yap</p>
+</div>
+                    </a>
+                    
+                    <a href="{{ url_for('movements') }}" class="quick-action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-list"></i>
+            </div>
+                        <div class="action-content">
+                            <h6>Hareketler</h6>
+                            <p>Tüm hareketleri gör</p>
+                    </div>
+                        </a>
+                    
+                    <a href="{{ url_for('analytics') }}" class="quick-action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-chart-line"></i>
+                    </div>
+                        <div class="action-content">
+                            <h6>Analizler</h6>
+                            <p>Raporları incele</p>
+                    </div>
+                        </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Modern Dashboard Styles */
+.dashboard-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.dashboard-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.dashboard-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0.5rem 0 0 0;
+    font-weight: 400;
+}
+
+.dashboard-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-modern {
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.btn-modern.btn-outline {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 2px solid rgba(255,255,255,0.3);
+}
+
+.btn-modern.btn-outline:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+/* Modern Cards */
+.modern-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.modern-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+}
+
+.card-header-modern {
+    padding: 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    background: #fafbfc;
+}
+
+.card-title-modern {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.card-subtitle-modern {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 0.5rem 0 0 0;
+}
+
+.card-body-modern {
+    padding: 1.5rem;
+}
+
+/* Stats Cards */
+.stats-card-modern {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem 1.5rem;
+    height: 100%;
+    min-height: 220px;
+}
+
+.stats-card-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #4f46e5, #7c3aed);
+}
+
+.card-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.3);
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.stats-card-modern:hover .card-icon {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+}
+
+.card-icon i {
+    font-size: 1.75rem;
+    color: white;
+}
+
+.card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    flex: 1;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+}
+
+.card-number {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0;
+    line-height: 1;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+}
+
+.card-label {
+    font-size: 0.95rem;
+    color: #64748b;
+    margin: 0;
+    font-weight: 600;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 1.2rem;
+    line-height: 1.2;
+}
+
+.card-trend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.4rem 0.8rem;
+    border-radius: 16px;
+    background: rgba(79, 70, 229, 0.1);
+    color: #4f46e5;
+    margin-top: 0.25rem;
+    flex-shrink: 0;
+    min-height: 2rem;
+    margin-top: 0.5rem;
+}
+
+.card-trend.positive {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+}
+
+.card-trend.negative {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
+.card-trend.neutral {
+    background: rgba(107, 114, 128, 0.1);
+    color: #6b7280;
+}
+
+/* Header Actions */
+.header-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: none;
+    background: #f1f5f9;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-icon:hover {
+    background: #e2e8f0;
+    color: #475569;
+    transform: scale(1.05);
+}
+
+/* Movements List */
+.movements-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.movement-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.movement-item:hover {
+    background: #f1f5f9;
+    transform: translateX(4px);
+}
+
+.movement-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.movement-icon i {
+    font-size: 1.25rem;
+}
+
+.movement-content {
+    flex: 1;
+}
+
+.movement-product {
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.25rem;
+}
+
+.movement-details {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.badge-modern {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-modern.success {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.badge-modern.danger {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.movement-quantity {
+    font-size: 0.875rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.movement-user {
+    color: #4f46e5;
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.movement-user i {
+    color: #6366f1;
+    font-size: 0.75rem;
+}
+
+.movement-time {
+    font-size: 0.875rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #64748b;
+}
+
+/* Quick Actions */
+.quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.quick-action-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.quick-action-card:hover {
+    background: #f1f5f9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-color: #e2e8f0;
+    text-decoration: none;
+    color: inherit;
+}
+
+.action-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.action-icon i {
+    font-size: 1.25rem;
+    color: white;
+}
+
+.action-content h6 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 0.25rem 0;
+}
+
+.action-content p {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dashboard-header {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .dashboard-title {
+        font-size: 2rem;
+    }
+    
+    .dashboard-actions {
+        flex-direction: column;
+        width: 100%;
+        margin-top: 1rem;
+    }
+    
+    .quick-actions-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-card-modern {
+        padding: 1.5rem 1rem;
+        min-height: 200px;
+    }
+    
+    .card-content {
+        gap: 0.5rem;
+        padding: 0.25rem 0;
+    }
+    
+    .card-number {
+        font-size: 2.2rem;
+        min-height: 2.5rem;
+    }
+    
+    .card-label {
+        font-size: 0.85rem;
+        min-height: 1rem;
+    }
+    
+    .card-trend {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.6rem;
+        min-height: 1.8rem;
+    }
+    
+    .card-icon {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 0.75rem;
+    }
+    
+    .card-icon i {
+        font-size: 1.5rem;
+    }
+    
+    .movement-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .movement-details {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .movement-user {
+        font-size: 0.8rem;
+    }
+    
+    .movement-details {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function cleanData() {
+    // Onay penceresi
+    if (confirm('⚠️ DİKKAT!\n\nTÜM VERİLER TEMİZLENECEK:\n- Tüm ürünler\n- Tüm hareketler\n- Tüm cihazlar\n\nBu işlem geri alınamaz!\nBackup otomatik oluşturulacaktır.\n\nDevam etmek istiyor musunuz?')) {
+        // İkinci onay
+        if (confirm('⚠️ SON UYARI!\n\nEMİN MİSİNİZ?\n\nTüm veriler temizlenecek ve bu işlem GERİ ALINAMAZ!')) {
+            // Form oluştur ve gönder
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ url_for("clean_data") }}';
+            
+            // CSRF token ekle (eğer varsa)
+            const csrf = document.querySelector('meta[name="csrf-token"]');
+            if (csrf) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'csrf_token';
+                input.value = csrf.content;
+                form.appendChild(input);
+            }
+            
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+}
+</script>
+{% endblock %}

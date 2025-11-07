@@ -1,0 +1,585 @@
+{% extends "base.html" %}
+
+{% block title %}Şarj Cihazları - Ases Stok Takip{% endblock %}
+
+{% block content %}
+<!-- Modern Header -->
+<div class="products-header">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h1 class="products-title">Şarj Cihazları Yönetimi</h1>
+            <p class="products-subtitle">Tüm şarj cihazlarınızı görüntüleyin, düzenleyin ve yönetin</p>
+        </div>
+        <div class="products-actions">
+            <a href="{{ url_for('export_chargers_excel') }}?search={{ request.args.get('search', '') }}&brand={{ request.args.get('brand', '') }}&model={{ request.args.get('model', '') }}" 
+               class="btn-modern btn-outline me-2">
+                <i class="fas fa-file-excel me-2"></i>Excel İndir
+            </a>
+            <a href="{{ url_for('add_charger') }}" class="btn-modern btn-primary">
+                <i class="fas fa-plus me-2"></i>Yeni Şarj Cihazı Ekle
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Modern Arama ve Filtreler -->
+<div class="modern-card mb-5">
+    <div class="card-header-modern">
+        <div class="header-content">
+            <h5 class="card-title-modern">
+                <i class="fas fa-search me-3"></i>Arama ve Filtreler
+            </h5>
+            <p class="card-subtitle-modern">Şarj cihazlarını marka, model veya diğer kriterlere göre filtreleyin</p>
+        </div>
+    </div>
+    <div class="card-body-modern">
+        <form method="GET" class="search-form" id="chargersSearchForm">
+            <div class="search-grid">
+                <div class="search-field">
+                    <label for="search" class="field-label">Arama</label>
+                    <div class="input-group-modern">
+                        <i class="fas fa-search input-icon" id="searchIcon"></i>
+                        <input type="text" class="form-control-modern" id="search" name="search" 
+                               placeholder="Marka, model, barkod veya seri no..." 
+                               value="{{ request.args.get('search', '') }}">
+                        <button type="button" id="searchBtn" class="btn-modern btn-primary" style="margin-left: 0.5rem;">
+                            <i class="fas fa-search me-2"></i>Ara
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="search-field">
+                    <label for="brand" class="field-label">Marka</label>
+                    <div class="select-group-modern">
+                        <i class="fas fa-tag select-icon"></i>
+                        <select class="form-select-modern" id="brand" name="brand">
+                            <option value="">Tüm Markalar</option>
+                            {% for brand in brands %}
+                            <option value="{{ brand }}" 
+                                    {% if request.args.get('brand') == brand %}selected{% endif %}>
+                                {{ brand }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="search-field">
+                    <label for="model" class="field-label">Model</label>
+                    <div class="select-group-modern">
+                        <i class="fas fa-cube select-icon"></i>
+                        <select class="form-select-modern" id="model" name="model">
+                            <option value="">Tüm Modeller</option>
+                            {% for m, total in models_with_counts %}
+                            <option value="{{ m }}" 
+                                    {% if request.args.get('model') == m %}selected{% endif %}>
+                                {{ m }} (adet {{ total }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="search-actions">
+                    <a href="{{ url_for('chargers') }}" class="btn-modern btn-outline">
+                        <i class="fas fa-times me-2"></i>Temizle
+                    </a>
+                    <div class="results-count">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <span id="resultsCount">Arama yapın...</span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Bilgi Mesajı -->
+<div class="alert alert-info mb-3" role="alert">
+    <i class="fas fa-info-circle me-2"></i>
+    <strong>Bilgi:</strong> Bu sayfada sadece stokta olan şarj cihazları (adet > 0) gösterilmektedir.
+</div>
+
+<!-- Şarj Cihazları Tablosu -->
+<div class="modern-card">
+    <div class="card-header-modern">
+        <div class="header-content">
+            <h5 class="card-title-modern">
+                <i class="fas fa-battery-full me-3"></i>Şarj Cihazları Listesi
+            </h5>
+            <p class="card-subtitle-modern">{{ chargers|length }} şarj cihazı bulundu</p>
+        </div>
+    </div>
+    <div class="card-body-modern">
+        {% if chargers %}
+        <div class="table-view">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle table-modern">
+                    <thead>
+                        <tr>
+                            <th>Marka</th>
+                            <th>Model</th>
+                            <th>Barkod</th>
+                            <th>Seri No</th>
+                            <th>Stok</th>
+                            <th>Tarih</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for charger in chargers %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('chargers', brand=charger.marka, model=request.args.get('model', ''), search=request.args.get('search', '')) }}" 
+                                   class="link-modern">
+                                    <strong>{{ charger.marka }}</strong>
+                                </a>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('chargers', brand=request.args.get('brand', ''), model=charger.model, search=request.args.get('search', '')) }}" 
+                                   class="link-modern">
+                                    {{ charger.model }}
+                                </a>
+                            </td>
+                            <td><code class="code-modern">{{ charger.barkod }}</code></td>
+                            <td><code class="code-modern">{{ charger.seri_no }}</code></td>
+                            <td>
+                                <span class="badge-modern {% if charger.adet > 10 %}success{% elif charger.adet > 0 %}warning{% else %}danger{% endif %}">
+                                    {{ charger.adet }}
+                                </span>
+                            </td>
+                            <td>{{ charger.created_at.strftime('%d.%m.%Y') }}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button type="button" class="btn btn-sm btn-outline-danger"
+                                            onclick="confirmDelete({{ charger.id }}, '{{ charger.marka }} {{ charger.model }}')"
+                                            title="Şarj Cihazını Sil">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-battery-full fa-4x text-muted mb-3"></i>
+            <h5 class="text-muted">Şarj cihazı bulunamadı</h5>
+            <p class="text-muted">Arama kriterlerinize uygun şarj cihazı bulunmuyor.</p>
+            <a href="{{ url_for('add_charger') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>İlk Şarj Cihazını Ekle
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Modern Products Page Styles */
+.products-header {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.products-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.products-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0.5rem 0 0 0;
+    font-weight: 400;
+}
+
+.products-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-modern {
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-modern.btn-primary {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: white;
+}
+
+.btn-modern.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-modern.btn-outline {
+    background: white;
+    color: #1f2937;
+    border: 2px solid #e5e7eb;
+    font-weight: 600;
+}
+
+.btn-modern.btn-outline:hover {
+    background: #f9fafb;
+    border-color: #4f46e5;
+    color: #4f46e5;
+    text-decoration: none;
+}
+
+/* Search Form */
+.search-form {
+    margin: 0;
+}
+
+.search-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr auto;
+    gap: 1.5rem;
+    align-items: end;
+}
+
+.search-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.field-label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+.input-group-modern {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 1rem;
+    color: #9ca3af;
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.form-control-modern {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form-control-modern:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.select-group-modern {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.select-icon {
+    position: absolute;
+    left: 1rem;
+    color: #9ca3af;
+    z-index: 2;
+}
+
+.form-select-modern {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    background: white;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+}
+
+.form-select-modern:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.search-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.results-count {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.results-count i {
+    color: #4f46e5;
+}
+
+/* Modern Cards */
+.modern-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.modern-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+}
+
+.card-header-modern {
+    padding: 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    background: #fafbfc;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-title-modern {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.card-subtitle-modern {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 0.5rem 0 0 0;
+}
+
+.card-body-modern {
+    padding: 1.5rem;
+}
+
+/* Table View */
+.table-modern {
+    width: 100%;
+    font-size: 0.875rem;
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table-modern th {
+    background: #f8f9fa;
+    color: #212529;
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.table-modern td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f8f9fa;
+    vertical-align: middle;
+    background: #ffffff;
+}
+
+.table-modern tr:hover {
+    background: #f8fafc;
+}
+
+.link-modern {
+    color: #0d6efd;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.link-modern:hover {
+    color: #0a58ca;
+    text-decoration: underline;
+}
+
+.code-modern {
+    background: #f8f9fa;
+    color: #212529;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    border: 1px solid #e9ecef;
+}
+
+.badge-modern {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid transparent;
+}
+
+.badge-modern.success { background: #e9f7ef; color: #155724; border-color: #c3e6cb; }
+.badge-modern.warning { background: #fff3cd; color: #856404; border-color: #ffeeba; }
+.badge-modern.danger  { background: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .products-header {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .products-title {
+        font-size: 2rem;
+    }
+    
+    .products-actions {
+        flex-direction: column;
+        width: 100%;
+        margin-top: 1rem;
+    }
+    
+    .search-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .search-actions {
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search');
+    const brandSelect = document.getElementById('brand');
+    const modelSelect = document.getElementById('model');
+    const form = document.getElementById('chargersSearchForm');
+    const searchBtn = document.getElementById('searchBtn');
+    
+    // Brand/Model değişince hemen filtrele
+    if (brandSelect) {
+        brandSelect.addEventListener('change', function() {
+            performSearch();
+        });
+    }
+    if (modelSelect) {
+        modelSelect.addEventListener('change', function() {
+            performSearch();
+        });
+    }
+
+    // Block Enter key from submitting
+    if (searchInput) {
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+            }
+        });
+    }
+
+    // Prevent form submit default
+    if (form) {
+        form.addEventListener('submit', function(e) { e.preventDefault(); });
+    }
+
+    // Only button click triggers search
+    if (searchBtn) {
+        searchBtn.addEventListener('click', function() {
+            performSearch();
+        });
+    }
+    
+    function performSearch() {
+        const formData = new FormData(form);
+        const params = new URLSearchParams();
+        
+        for (let [key, value] of formData.entries()) {
+            if (value.trim() !== '') {
+                params.append(key, value);
+            }
+        }
+        
+        const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+        window.location.href = newUrl;
+    }
+    
+    // Update results count
+    function updateResultsCount() {
+        const resultsCount = document.getElementById('resultsCount');
+        if (resultsCount) {
+            const tableRows = document.querySelectorAll('.table-modern tbody tr');
+            const count = tableRows.length;
+            
+            if (count > 0) {
+                resultsCount.textContent = `${count} şarj cihazı bulundu`;
+            } else {
+                resultsCount.textContent = 'Şarj cihazı bulunamadı';
+            }
+        }
+    }
+    
+    updateResultsCount();
+});
+
+// Delete confirmation
+function confirmDelete(chargerId, chargerName) {
+    if (confirm(`"${chargerName}" şarj cihazını silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz!`)) {
+        window.location.href = '{{ url_for("delete_charger", charger_id=0) }}'.replace('0', chargerId);
+    }
+}
+</script>
+{% endblock %}
+

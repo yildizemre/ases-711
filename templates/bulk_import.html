@@ -1,0 +1,496 @@
+{% extends "base.html" %}
+
+{% block title %}Toplu Stok Girişi - Stok Takip{% endblock %}
+
+{% block content %}
+
+<!-- Modern Header -->
+<div class="bulk-import-header">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h1 class="bulk-import-title">Toplu Stok Girişi</h1>
+            <p class="bulk-import-subtitle">Excel dosyası ile toplu ürün girişi yapın</p>
+        </div>
+        <div class="bulk-import-actions">
+            <a href="{{ url_for('products') }}" class="btn-modern btn-outline">
+                <i class="fas fa-arrow-left me-2"></i>Geri Dön
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <!-- Dosya Yükleme Kartı -->
+        <div class="modern-card">
+            <div class="card-header-modern">
+                <div class="header-content">
+                    <h5 class="card-title-modern">
+                        <i class="fas fa-file-excel me-3"></i>Excel Dosyası Yükle
+                    </h5>
+                    <p class="card-subtitle-modern">Excel dosyasını seçin ve toplu ürün girişi yapın</p>
+                </div>
+            </div>
+            <div class="card-body-modern">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST" enctype="multipart/form-data" class="bulk-import-form" id="bulkImportForm">
+                    <div class="file-upload-container">
+                        <div class="file-upload-area" id="fileUploadArea">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <div class="upload-text">
+                                <h6>Excel Dosyasını Buraya Sürükleyin</h6>
+                                <p class="text-muted">veya dosya seçmek için tıklayın</p>
+                                <small class="text-muted">Desteklenen formatlar: .xlsx, .xls</small>
+                            </div>
+                            <input type="file" 
+                                   class="file-input" 
+                                   id="excelFile" 
+                                   name="excel_file" 
+                                   accept=".xlsx,.xls" 
+                                   required>
+                        </div>
+                        <div class="file-info" id="fileInfo" style="display: none;">
+                            <div class="file-details">
+                                <i class="fas fa-file-excel text-success me-2"></i>
+                                <span class="file-name"></span>
+                                <span class="file-size"></span>
+                            </div>
+                            <button type="button" class="btn-remove-file" onclick="removeFile()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-actions mt-4">
+                        <button type="button" class="btn-modern btn-success" id="uploadBtn" disabled>
+                            <i class="fas fa-upload me-2"></i>Dosyayı Yükle ve İşle
+                        </button>
+                        <div class="upload-status mt-2" id="uploadStatus" style="display: none;">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Dosya seçildi, işleme başlayabilirsiniz.
+                            </small>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Örnek Dosya ve Talimatlar -->
+        <div class="modern-card mt-4">
+            <div class="card-header-modern">
+                <div class="header-content">
+                    <h5 class="card-title-modern">
+                        <i class="fas fa-info-circle me-3"></i>Nasıl Kullanılır?
+                    </h5>
+                    <p class="card-subtitle-modern">Excel dosyası formatı ve kullanım talimatları</p>
+                </div>
+            </div>
+            <div class="card-body-modern">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="mb-3">
+                            <i class="fas fa-download me-2 text-primary"></i>Örnek Dosya İndir
+                        </h6>
+                        <p class="text-muted mb-3">Doğru formatı görmek için örnek Excel dosyasını indirin.</p>
+                        <a href="{{ url_for('download_sample_excel') }}" class="btn-modern btn-primary">
+                            <i class="fas fa-file-excel me-2"></i>Örnek Excel Dosyası İndir
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="mb-3">
+                            <i class="fas fa-list me-2 text-success"></i>Gerekli Kolonlar
+                        </h6>
+                        <ul class="column-list">
+                            <li><strong>Marka:</strong> Ürün markası (zorunlu)</li>
+                            <li><strong>Model:</strong> Ürün modeli (zorunlu)</li>
+                            <li><strong>Barkod:</strong> Ürün barkodu (zorunlu, aynı olabilir)</li>
+                            <li><strong>Seri No:</strong> Seri numarası (zorunlu, benzersiz olmalı)</li>
+                            <li><strong>Adet:</strong> Stok miktarı (zorunlu, genelde 1)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h6 class="mb-3">
+                            <i class="fas fa-exclamation-triangle me-2 text-warning"></i>Önemli Kurallar
+                        </h6>
+                        <div class="rules-grid">
+                            <div class="rule-item">
+                                <i class="fas fa-check text-success me-2"></i>
+                                <span>Excel dosyasında 'Stok_Girişi' adında sayfa olmalı</span>
+                            </div>
+                            <div class="rule-item">
+                                <i class="fas fa-check text-success me-2"></i>
+                                <span>Marka ve Model büyük harfle yazılmalı</span>
+                            </div>
+                            <div class="rule-item">
+                                <i class="fas fa-check text-success me-2"></i>
+                                <span>Sadece Seri No benzersiz olmalı (Barkod aynı olabilir)</span>
+                            </div>
+                            <div class="rule-item">
+                                <i class="fas fa-check text-success me-2"></i>
+                                <span>Bir seferde en fazla 100 ürün eklenebilir</span>
+                            </div>
+                            <div class="rule-item">
+                                <i class="fas fa-check text-success me-2"></i>
+                                <span>Boş satırlar atlanır</span>
+                            </div>
+                            <div class="rule-item">
+                                <i class="fas fa-check text-success me-2"></i>
+                                <span>Hatalı satırlar gösterilir, diğerleri işlenir</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.bulk-import-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 3rem 0;
+    margin-bottom: 2rem;
+    border-radius: 0 0 20px 20px;
+}
+
+.bulk-import-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.bulk-import-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 0;
+}
+
+.file-upload-container {
+    position: relative;
+}
+
+.file-upload-area {
+    border: 2px dashed #d1d5db;
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f9fafb;
+}
+
+.file-upload-area:hover {
+    border-color: #4f46e5;
+    background: #f0f4ff;
+}
+
+.file-upload-area.dragover {
+    border-color: #4f46e5;
+    background: #e0e7ff;
+    transform: scale(1.02);
+}
+
+.upload-icon {
+    font-size: 3rem;
+    color: #6b7280;
+    margin-bottom: 1rem;
+}
+
+.file-upload-area:hover .upload-icon {
+    color: #4f46e5;
+}
+
+.file-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.file-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+.file-details {
+    display: flex;
+    align-items: center;
+}
+
+.file-name {
+    font-weight: 600;
+    color: #166534;
+    margin-right: 0.5rem;
+}
+
+.file-size {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.btn-remove-file {
+    background: none;
+    border: none;
+    color: #dc2626;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+.btn-remove-file:hover {
+    background: #fecaca;
+}
+
+.column-list {
+    list-style: none;
+    padding: 0;
+}
+
+.column-list li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.column-list li:last-child {
+    border-bottom: none;
+}
+
+.rules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.rule-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    background: #f9fafb;
+    border-radius: 8px;
+    border-left: 4px solid #10b981;
+}
+
+.rule-item span {
+    font-size: 0.9rem;
+}
+
+.btn-modern.btn-success {
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-modern.btn-success:hover {
+    background: #059669;
+    transform: translateY(-1px);
+}
+
+.btn-modern.btn-success:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+}
+
+@media (max-width: 768px) {
+    .bulk-import-title {
+        font-size: 2rem;
+    }
+    
+    .rules-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .file-upload-area {
+        padding: 2rem 1rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileUploadArea = document.getElementById('fileUploadArea');
+    const fileInput = document.getElementById('excelFile');
+    const fileInfo = document.getElementById('fileInfo');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const uploadStatus = document.getElementById('uploadStatus');
+
+    // Drag and drop events
+    fileUploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        fileUploadArea.classList.add('dragover');
+    });
+
+    fileUploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        fileUploadArea.classList.remove('dragover');
+    });
+
+    fileUploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        fileUploadArea.classList.remove('dragover');
+        
+        const files = e.dataTransfer.files;
+        console.log('Files dropped:', files);
+        console.log('Files length:', files.length);
+        
+        if (files.length > 0) {
+            console.log('Handling dropped file:', files[0]);
+            handleFileSelect(files[0]);
+            
+            // Set the file input value manually
+            fileInput.files = files;
+        }
+    });
+
+    // Click to select file
+    fileUploadArea.addEventListener('click', function() {
+        fileInput.click();
+    });
+
+    // File input change
+    fileInput.addEventListener('change', function() {
+        console.log('File input changed');
+        console.log('Files length:', this.files.length);
+        console.log('Files:', this.files);
+        
+        if (this.files.length > 0) {
+            console.log('Calling handleFileSelect with:', this.files[0]);
+            handleFileSelect(this.files[0]);
+        }
+    });
+
+    function handleFileSelect(file) {
+        // File type validation
+        const allowedTypes = [
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'application/vnd.ms-excel'
+        ];
+        
+        if (!allowedTypes.includes(file.type) && !file.name.match(/\.(xlsx|xls)$/)) {
+            alert('Lütfen sadece Excel dosyaları (.xlsx, .xls) seçin!');
+            return;
+        }
+
+        // File size validation (max 10MB)
+        if (file.size > 10 * 1024 * 1024) {
+            alert('Dosya boyutu 10MB\'dan küçük olmalıdır!');
+            return;
+        }
+
+        // Show file info
+        const fileName = file.name;
+        const fileSize = formatFileSize(file.size);
+        
+        document.querySelector('.file-name').textContent = fileName;
+        document.querySelector('.file-size').textContent = fileSize;
+        
+        fileUploadArea.style.display = 'none';
+        fileInfo.style.display = 'flex';
+        uploadBtn.disabled = false;
+        uploadStatus.style.display = 'block';
+        
+        // Debug: Check if button is enabled
+        console.log('File selected:', fileName);
+        console.log('Upload button disabled:', uploadBtn.disabled);
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    window.removeFile = function() {
+        fileInput.value = '';
+        fileUploadArea.style.display = 'block';
+        fileInfo.style.display = 'none';
+        uploadBtn.disabled = true;
+        uploadStatus.style.display = 'none';
+    };
+
+    // Form submit handler
+    const form = document.getElementById('bulkImportForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const file = fileInput.files[0];
+            console.log('Form submit triggered, file:', file);
+            
+            if (!file) {
+                e.preventDefault();
+                alert('Lütfen bir dosya seçin!');
+                return false;
+            }
+            
+            // Show loading state
+            uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>İşleniyor...';
+            uploadBtn.disabled = true;
+            
+            console.log('Form submitting...');
+            return true;
+        });
+    }
+
+    // Button click handler as backup
+    uploadBtn.addEventListener('click', function(e) {
+        console.log('Button clicked');
+        console.log('File input files:', fileInput.files);
+        console.log('File input files length:', fileInput.files.length);
+        
+        const file = fileInput.files[0];
+        console.log('Selected file:', file);
+        
+        if (!file || fileInput.files.length === 0) {
+            e.preventDefault();
+            alert('Lütfen bir dosya seçin!');
+            return false;
+        }
+        
+        // Show loading state
+        uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>İşleniyor...';
+        uploadBtn.disabled = true;
+        
+        // Manually submit form
+        console.log('Manually submitting form...');
+        form.submit();
+    });
+});
+</script>
+{% endblock %}

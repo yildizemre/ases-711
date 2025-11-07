@@ -1,0 +1,456 @@
+{% extends "base.html" %}
+
+{% block title %}Hareket Düzenle - Stok Takip{% endblock %}
+
+{% block content %}
+<!-- Modern Header -->
+<div class="edit-movement-header">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="edit-movement-title">Hareket Düzenle</h1>
+            <p class="edit-movement-subtitle">Hareket bilgilerini güncelleyin</p>
+        </div>
+        <div class="edit-movement-actions">
+            <a href="{{ url_for('movements') }}" class="btn-modern btn-outline">
+                <i class="fas fa-arrow-left me-2"></i>Geri Dön
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Hareket Bilgileri -->
+<div class="modern-card mb-4">
+    <div class="card-header-modern">
+        <h5 class="card-title-modern">
+            <i class="fas fa-info-circle me-3"></i>Mevcut Hareket Bilgileri
+        </h5>
+    </div>
+    <div class="card-body-modern">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="info-item">
+                    <label class="info-label">Marka:</label>
+                    <span class="info-value">{{ movement.product.marka }}</span>
+                </div>
+                <div class="info-item">
+                    <label class="info-label">Model:</label>
+                    <span class="info-value">{{ movement.product.model }}</span>
+                </div>
+                <div class="info-item">
+                    <label class="info-label">Barkod:</label>
+                    <span class="info-value">
+                        <code class="product-code">{{ movement.product.barkod }}</code>
+                    </span>
+                </div>
+                <div class="info-item">
+                    <label class="info-label">Seri No:</label>
+                    <span class="info-value">
+                        <code class="product-code">{{ movement.product.seri_no }}</code>
+                    </span>
+                </div>
+                <div class="info-item">
+                    <label class="info-label">Mevcut Stok:</label>
+                    <span class="info-value badge-modern {% if movement.product.adet > 10 %}success{% elif movement.product.adet > 0 %}warning{% else %}danger{% endif %}">
+                        {{ movement.product.adet }} adet
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="info-item">
+                    <label class="info-label">Kullanıcı:</label>
+                    <span class="info-value">{{ movement.user.username }}</span>
+                </div>
+                <div class="info-item">
+                    <label class="info-label">Oluşturulma Tarihi:</label>
+                    <span class="info-value">{{ movement.tarih.strftime('%d.%m.%Y %H:%M:%S') }}</span>
+                </div>
+                <div class="info-item">
+                    <label class="info-label">Hareket Türü:</label>
+                    <span class="info-value badge-modern {% if movement.movement_type == 'giris' %}success{% else %}danger{% endif %}">
+                        {% if movement.movement_type == 'giris' %}
+                            <i class="fas fa-arrow-up me-1"></i>Giriş
+                        {% else %}
+                            <i class="fas fa-arrow-down me-1"></i>Çıkış
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="info-item">
+                    <label class="info-label">Mevcut Adet:</label>
+                    <span class="info-value badge-modern primary">{{ movement.adet }}</span>
+                </div>
+                {% if movement.movement_type == 'cikis' %}
+                <div class="info-item">
+                    <label class="info-label">Hasta:</label>
+                    <span class="info-value text-primary">{{ movement.hasta_adi or '-' }}</span>
+                </div>
+                <div class="info-item">
+                    <label class="info-label">Bildirim:</label>
+                    <span class="info-value badge-modern {% if movement.verme_bildirimi == 'verildi' %}success{% else %}warning{% endif %}">
+                        {% if movement.verme_bildirimi == 'verildi' %}
+                            <i class="fas fa-check me-1"></i>Verildi
+                        {% elif movement.verme_bildirimi == 'verilmedi' %}
+                            <i class="fas fa-times me-1"></i>Verilmedi
+                        {% else %}
+                            -
+                        {% endif %}
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Düzenleme Formu -->
+<div class="modern-card">
+    <div class="card-header-modern">
+        <h5 class="card-title-modern">
+            <i class="fas fa-edit me-3"></i>Hareket Düzenle
+        </h5>
+    </div>
+    <div class="card-body-modern">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" class="edit-movement-form">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="movement_type" class="form-label-modern">Hareket Türü</label>
+                    <div class="select-group-modern">
+                        <i class="fas fa-exchange-alt select-icon"></i>
+                        <select class="form-select-modern" id="movement_type" name="movement_type" required>
+                            <option value="giris" {% if movement.movement_type == 'giris' %}selected{% endif %}>
+                                <i class="fas fa-arrow-up me-2"></i>Giriş
+                            </option>
+                            <option value="cikis" {% if movement.movement_type == 'cikis' %}selected{% endif %}>
+                                <i class="fas fa-arrow-down me-2"></i>Çıkış
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="adet" class="form-label-modern">Adet</label>
+                    <div class="input-group-modern">
+                        <i class="fas fa-hashtag input-icon"></i>
+                        <input type="number" class="form-control-modern" id="adet" name="adet" 
+                               value="{{ movement.adet }}" min="1" required>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="tarih" class="form-label-modern">Tarih ve Saat</label>
+                    <div class="input-group-modern">
+                        <i class="fas fa-calendar-alt input-icon"></i>
+                        <input type="datetime-local" class="form-control-modern" id="tarih" name="tarih" 
+                               value="{{ movement.tarih.strftime('%Y-%m-%dT%H:%M') }}" required>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="hasta_adi" class="form-label-modern">Teslim Edilen Hasta</label>
+                    <div class="input-group-modern">
+                        <i class="fas fa-user input-icon"></i>
+                        <input type="text" class="form-control-modern" id="hasta_adi" name="hasta_adi" 
+                               value="{{ movement.hasta_adi or '' }}" placeholder="Hasta adı soyadı" style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="verme_bildirimi" class="form-label-modern">Verme Bildirimi</label>
+                    <div class="input-group-modern">
+                        <i class="fas fa-bell input-icon"></i>
+                        <select class="form-control-modern" id="verme_bildirimi" name="verme_bildirimi">
+                            <option value="">Seçiniz</option>
+                            <option value="verildi" {% if movement.verme_bildirimi == 'verildi' %}selected{% endif %}>Verildi</option>
+                            <option value="verilmedi" {% if movement.verme_bildirimi == 'verilmedi' %}selected{% endif %}>Verilmedi</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="aciklama" class="form-label-modern">Açıklama</label>
+                    <div class="input-group-modern">
+                        <i class="fas fa-comment input-icon"></i>
+                        <input type="text" class="form-control-modern" id="aciklama" name="aciklama" 
+                               value="{{ movement.aciklama or '' }}" placeholder="Açıklama giriniz">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-modern btn-primary">
+                    <i class="fas fa-save me-2"></i>Güncelle
+                </button>
+                <a href="{{ url_for('movements') }}" class="btn-modern btn-outline">
+                    <i class="fas fa-times me-2"></i>İptal
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Uyarı Kutusu -->
+<div class="modern-card mt-4">
+    <div class="card-body-modern">
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Dikkat:</strong> Hareket düzenlendiğinde ürün stok miktarı otomatik olarak güncellenecektir. 
+            Negatif stok miktarına neden olacak değişiklikler yapılamaz.
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.edit-movement-header {
+    margin-bottom: 2rem;
+}
+
+.edit-movement-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+}
+
+.edit-movement-subtitle {
+    font-size: 1.1rem;
+    color: #64748b;
+    margin: 0.5rem 0 0 0;
+}
+
+.edit-movement-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #374151;
+    margin: 0;
+}
+
+.info-value {
+    color: #1f2937;
+    font-weight: 500;
+}
+
+.product-code {
+    font-size: 0.8rem;
+    color: #4f46e5;
+    background: #f0f4ff;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    border: 1px solid #e0e7ff;
+}
+
+.badge-modern {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-modern.success {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.badge-modern.warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.badge-modern.danger {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.badge-modern.primary {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
+.edit-movement-form {
+    margin-top: 1rem;
+}
+
+.form-label-modern {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.btn-modern {
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.btn-modern.btn-primary {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: white;
+    border: none;
+}
+
+.btn-modern.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-modern.btn-outline {
+    background: transparent;
+    color: #6b7280;
+    border: 2px solid #e5e7eb;
+}
+
+.btn-modern.btn-outline:hover {
+    background: #f9fafb;
+    color: #374151;
+    text-decoration: none;
+}
+
+.input-group-modern {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 1rem;
+    color: #9ca3af;
+    z-index: 2;
+}
+
+.form-control-modern {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form-control-modern:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.select-group-modern {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.select-icon {
+    position: absolute;
+    left: 1rem;
+    color: #9ca3af;
+    z-index: 2;
+}
+
+.form-select-modern {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    background: white;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+}
+
+.form-select-modern:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.alert {
+    border: none;
+    border-radius: 12px;
+    border-left: 4px solid;
+    padding: 1rem 1.5rem;
+}
+
+.alert-warning {
+    border-left-color: #f59e0b;
+    background: #fef3c7;
+    color: #92400e;
+}
+
+@media (max-width: 768px) {
+    .edit-movement-title {
+        font-size: 2rem;
+    }
+    
+    .edit-movement-actions {
+        flex-direction: column;
+        width: 100%;
+        margin-top: 1rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn-modern {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}
